@@ -1,0 +1,121 @@
+============ Machine Learning Algorithm Assignment Design Document ============
+
+***** What have I done? *****
+  I used Boosting + Bagging + Decision Tree to build a classifier. Once built,
+the classifier can be trained and tested with data.
+  The train & test data set is about Reuters category "corporate aquisitions", 
+which is provided from the teacher's website.
+
+***** Source Tree *****
+code/
+  boosting.c        # AdaBoost + Bagging
+  boosting.h
+  decision_tree.c   # C4.5 Decision Tree
+  decision_tree.h
+  hash_table.c      # hash table for storing sparse matrix
+  hash_table.h
+  makefile          # makefile
+  reuters.c         # main program
+  test.dat          # test data
+  train.dat         # train data
+
+***** Compilation *****
+  My source code can be easily compiled on Linux. Just open a terminal and 
+change to the 'code' directory, then type 'make' or use gcc. For example:
+  $ cd 08386001/code/
+  $ make
+or
+  $ cd 08386001/code/
+  $ gcc -lm -o reuters *.c
+
+  It can also be compiled on Windows using common C compilers simiarly.
+
+***** Run *****
+Usage for the program:
+  $ ./reuters <train data> <test data> [iterations (default = 20)]
+For example:
+  $ ./reuters train.dat test.dat      # train with train.dat for 20 iterations, 
+                                      # test with test.dat
+  $ ./reuters train.dat test.dat 50   # train with train.dat for 50 iterations, 
+                                      # test with test.dat
+
+***** Results *****
+  With experimentations, I found out my program's accuracy is above 88% against
+the given data sets. And the accuracy depends on the iteration times, the higher 
+the iteration times, the higher the accuracy.
+  iterations  accuracy
+      1        88.3%
+      5        93.8%
+     10        94.5%
+     20        95.5%
+     50        97.0%
+    100        97.3%
+   1000        97.3%
+
+***** Data structs for sparse matrix *****
+  I used a hash table to store the sparse matrix, the hash table can be used
+easily by the following functions:
+  void hash_insert(int row, int col, double value);
+  double hash_find(int row, int col);
+
+***** Implementations of Decision Tree *****
+  I used C4.5 Decision Tree as the 'weak learners' in the boosting algorithm.
+Pseudo code:
+  input: 
+    a matrix x[][]: contains input train data,
+    a vector y[]: contains output
+    a vector d[]: weights of data
+  output: 
+    a decision tree
+  algorithm:
+    1. if all data have same class, return a singleton;
+    2. find best attributes and best split value, such that infomation gain is
+       maximized:
+         infomation gain = entropy(x) - p1 * entropy(x1) - p2 * entropy(x2)
+         entropy(x) = d1 * log(1 / d1) + d2 * log(1 / d2) + ...
+    3. if max infomation gain <= 0, return a singleton;
+    4. partition x, y, d into x1, y1, d1 and x2, y2, d2, according to the best 
+       attributes and best split value;
+    5. return a node:
+         whose left subtree is a decision tree built on x1, y1, d1;
+         whose right subtree is a decision tree built on x2, y2, d2;
+
+***** Implementations of Boosting *****
+  I used AdaBoost to be the boosting algorithm, and C4.5 Decision Tree as the
+'weak learners'. Pseudo code:
+  input:
+    a matrix x[n][m]: contains input train data,
+    a vector y[n]: contains output
+    T: iteration times
+  output:
+    H(x): a strong classifier
+  algorithm:
+    1. initialize D[i] = 1 / n
+    2. for t = 1, 2, ..., T do
+         h[t] = decision_tree(x1, y1, D1) for a subset of x, y, D; # bagging!!
+         e[t] = sigma { D[i] | h[t](x[i]) != y[i] }
+         a[t] = ln ((1 - e[t]) / e[t]) / 2
+         update D[]:
+           D[i] = D[i] / exp(a[t]), if h[t](x[i]) == y[i];
+           D[i] = D[i] * exp(a[t]), if h[t](x[i]) != y[i]
+         normalize D[] such that sigma { D[i] } == 1
+    3. output H(x) = argmax { c; a[t] * h[t](x) == c }
+
+***** Implementations of Bagging *****
+  Bagging is used within the AdaBoost algorithm given above. When to train a
+Decision Tree, I randomly choose a subset of the data to do it. The fraction
+of records is chosen is a function of T:
+  p(T) = 0.5 * (1.0 / T + 1.0)
+  p(1) = 1.00
+  p(5) = 0.60
+  p(10) = 0.55
+  ...
+
+***** Summary *****
+  After finishing this assignment, I understood some algorithm and some basis
+better. I've heard of boosting, decision tree and bagging before, but I've never
+implemented them. When I implemented them successfully and found that the result
+are actually quite good and I have 88.3% accuracy, I am so excited about this.
+  It's funny to study machine learning algorithms. They solved real world
+problems not perfectly but good enough. This is very important and meaningful
+to the world.
