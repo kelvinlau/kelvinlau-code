@@ -1,0 +1,222 @@
+======= Technical Report for Project 1 (External Merge Sort) =======
+
+
+
+*** Summary ***
+
+	The goal of this project is to sort a 724 MB data file, containing 6,001,215 tuples,
+using two alternatives of external merge sort algorithm, with / without double buffering,
+and using different number of buffer pages, 12 or 130.
+
+	Being a classic sorting algorithm, it's not hard to implement merge sort. Even if it
+becomes external, all we have to do more are file system operations and buffer management.
+
+	The project also asks us to implement double buffering. The idea is clear, simply
+overlaping I/O and CPU activities. But when we think about how to actually implement it,
+we found that there are one more way to achieve the overlaping. For example, we can match
+the buffers into pairs, and two buffers in the same pair work alternately, one for 
+currently use, another one for read ahead. Or we can just split the file into two parts,
+then sort them concurrently, and finally merge them. We don't know which is better, plus,
+we are not familiar with multithreading programing, this job is challenging.
+
+
+
+*** Data structure ***
+
+	At first, we use the a struct to store one tuple, its stores the original text in it,
+and 2 integers to store the 2 important keys. Its member and I/O method is listed below:
+
+struct line
+{
+	int x;			// first key
+	int y;			// second key
+	char s[160];	// original text
+};
+
+void line_read(FILE *f, struct line *line)
+{
+	fscanf(f, "%[^\n]%*[\n]", line->s);
+	sscanf(line->s, "%d%*c%d", &line->x, &line->y);
+}
+
+void line_write(FILE *f, struct line *line)
+{
+	fprintf(f, "%s\n", line->s);
+}
+
+
+	Then we found that the member 's' is huge in size but is useless while sorting, so we
+extract the 2 important keys and the position in input file, making a new struct record.
+When sort completed, we can use the 'p' member to recover full tuples.
+	The size of struct record is 12 bytes, much smaller than the size of struct line, 168
+bytes, this can greatly reduce I/O cost while sorting.
+
+struct record
+{
+	int x;	// first key
+	int y;	// second key
+	int p;	// position in file
+};
+
+	
+	Buffer pages are allocated in static array. So there is always 130 pages, but we will
+not use all of them if user has specified smaller buffer number.
+
+#define K 130			// pages number
+#define M (8192/12)		// records per page
+struct record buffer[K][M];
+
+
+
+*** Pseudo-code for EMS without double buffering ***
+
+procedure ems(infile, outfile)
+{
+	while infile is not end
+	{
+		read a page from infile
+		quick sort the page
+		write the page to outfile
+	}
+	
+    merge sort outfile:
+    {
+        split the file into k parts  		(k-way merge)
+        for i in [0, k)
+        	merge sort part[i];
+        
+        for i in [0, k)
+        {
+        	read first page of part[i] into buffer[i]
+        	set pt[i] point to begining of buffer[i]
+        }
+        
+	    make a temporary file (tmpfile)
+        while exists record in any input buffers
+		{
+			choose i such that the record pt[i] is smallest
+			append record pt[i] to buffer[k]			(output buffer = buffer[k])
+			set pt[i] point to next record in buffer[i]
+			
+		    if pt[i] has passed buffer[i]
+		    {
+		    	read the next page from outfile to buffer[i]
+        		set pt[i] point to begining of buffer[i]
+		    }
+		    if buffer[k] is full or all input buffers empty
+		    {
+		    	write buffer[k] back to tmpfile
+		    	clear buffer[k]
+		    }
+		}
+		copy data from tmpfile back to outfile
+    }
+}
+
+
+
+*** Pseudo-code for EMS with double buffering ***
+
+procedure ems(infile, outfile)
+{
+	while infile is not end
+	{
+		read a page from infile
+		quick sort the page
+		write the page to outfile
+	}
+	
+    merge sort outfile:
+    {
+        split the file into k parts  		(k-way merge)
+        for i in [0, k)
+        	merge sort part[i];
+        
+        for i in [0, k)
+        {
+        	read first page of part[i] into buffer[i]
+        	set pt[i] point to begining of buffer[i]
+        	request parallel read the next page into buffer[i']			
+        }
+        
+	    make a temporary file (tmpfile)
+        while exists record in any input buffers
+		{
+			choose i such that the record pt[i] is smallest
+			append record pt[i] to buffer[k]			(output buffer = buffer[k])
+			set pt[i] point to next record in buffer[i]
+			
+		    if pt[i] has passed buffer[i]
+		    {
+		    	wait for request i' to finish							
+		    	switch i and i'											
+        		request parallel read the next page into buffer[i']		
+        		set pt[i] point to begining of buffer[i]				
+		    }
+		    if buffer[k] is full or all input buffers empty
+		    {
+		    	wait for request k' to finish							
+		    	request parallel write buffer[k] back to tmpfile		
+		    	switch k and k'											
+		    }
+		}
+		copy data from tmpfile back to outfile
+    }
+}
+
+
+
+*** Comparision ***
+
+This is the running result on my machine:
+
+		 | 12 pages              | 130 pages
+---------+-----------------------+--------------------
+without	 | 35 sec / 4 passes     | 35 sec / 2 passes
+---------+-----------------------+--------------------
+with     | 36 sec / 4 passes     | 36 sec / 2 passes
+
+	We can see there is no difference between 12 pages case and 130 pages case, we think 
+that is because I/O cost is cheap when sorting.
+	We also see it take more time to sort with double buffering than without. That is 
+because CPU and I/O activities didn't last long while sorting, and threads are created 
+and switched frequently.
+
+
+
+*** Page Format (Task 2) ***
+
+	Our goal is to arrange tuples into many 1kb pages. We greedily put as much tuples as
+it can into 1 page, in the following format:
+
++--------------------------------------------------------------+
+| record 0 ////////////////////////////////////////////////////|
++--------------------------------------------------------------+
+|/////////| record 1 //////////////////////////////////////////|
++--------------------------------------------------------------+
+|//////////////| record 2 /////////////////////////////////////|
++--------------------------------------------------------------+
+|///////////////////////////| ...                              |
++--------------------------------------------------------------+
+|                                                              |
++--------------------------------------------------------------+
+|                                                              |
++--------------------------------------------------------------+
+|                                                              |
++--------------------------------------------------------------+
+| ... | len2 | offset2 | len1 | offset1 | len0 | offset0 | num |
++--------------------------------------------------------------+
+
+	We put the records one by one forwards, while we put the number of records in this
+pages and <offset, length> pairs backwards.
+	When a page is created, it will be renamed with 7 digits postfix. And all the pages
+are contained in a folder which is renamed as user specified. Like the following:
+
+--+(lineitem_sorted)
+  |-----lineitem_sorted.0000000
+  |-----lineitem_sorted.0000001
+  |-----lineitem_sorted.0000002
+  |-----...
+
+
+
