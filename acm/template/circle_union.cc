@@ -31,10 +31,12 @@ struct circle {
 };
 
 inline int contains(const circle &a, const circle &b) {
-  return a.r >= b.r && sqr(a.o.x - b.o.x) + sqr(a.o.y - b.o.y) <= sqr(a.r - b.r);
+  return a.r >= b.r &&
+    sqr(a.o.x - b.o.x) + sqr(a.o.y - b.o.y) <= sqr(a.r - b.r);
 }
 
-inline int ip_circle_circle(const circle &c1, const circle &c2, point &p1, point &p2) {
+inline int ip_circle_circle(const circle &c1, const circle &c2,
+                            point &p1, point &p2) {
   double mx = c2.o.x - c1.o.x, sx = c2.o.x + c1.o.x, mx2 = sqr(mx);
   double my = c2.o.y - c1.o.y, sy = c2.o.y + c1.o.y, my2 = sqr(my);
   double sq = mx2 + my2, d = -(sq - sqr(c1.r - c2.r)) * (sq - sqr(c1.r + c2.r));
@@ -115,7 +117,8 @@ double solve(double ya, double yb) {
       if (b == 0) {
         x1 = max(0.0, a[i].x1);
         x2 = max(0.0, a[i].x2);
-        if (a[i].x1 + a[i].x2 > 0) res += area_bow(a[i].c->r, hypot(ya - yb, x1 - x2));
+        if (a[i].x1 + a[i].x2 > 0)
+          res += area_bow(a[i].c->r, hypot(ya - yb, x1 - x2));
       }
       b++;
     } else {
@@ -124,7 +127,8 @@ double solve(double ya, double yb) {
         x3 = min(X, a[i].x1);
         x4 = min(X, a[i].x2);
         res += (x3 + x4 - x1 - x2) * (yb - ya) / 2;
-        if (a[i].x1 + a[i].x2 < X + X) res += area_bow(a[i].c->r, hypot(ya - yb, x3 - x4));
+        if (a[i].x1 + a[i].x2 < X + X)
+          res += area_bow(a[i].c->r, hypot(ya - yb, x3 - x4));
       }
     }
   }

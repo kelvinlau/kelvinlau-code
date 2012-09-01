@@ -36,10 +36,12 @@ struct event {
   bool operator<(const event e) const { return a < e.a; }
 };
 
-inline int ip_circle_circle(const circle &c1, const circle &c2, point &p1, point &p2) {
+inline int ip_circle_circle(
+    const circle &c1, const circle &c2, point &p1, point &p2) {
   double mx = c2.o.x - c1.o.x, sx = c2.o.x + c1.o.x, mx2 = sqr(mx);
   double my = c2.o.y - c1.o.y, sy = c2.o.y + c1.o.y, my2 = sqr(my);
-  double sq = mx2 + my2, d = -(sq - sqr(c1.r - c2.r)) * (sq - sqr(c1.r + c2.r));
+  double sq = mx2 + my2; 
+  double d = -(sq - sqr(c1.r - c2.r)) * (sq - sqr(c1.r + c2.r));
   if (!sign(sq)) return 0;
   if (d + eps < 0) return 0;
   if (d < eps) d = 0; else d = sqrt(d);
@@ -62,7 +64,8 @@ inline double angle(point a, point b) {
 }
 
 inline int contains(const circle &c1, const circle &c2) {
-  return c1.r > c2.r && sign(sqr(c1.o.x - c2.o.x) + sqr(c1.o.y - c2.o.y) - sqr(c1.r - c2.r)) <= 0;
+  return c1.r > c2.r &&
+    sign(sqr(c1.o.x - c2.o.x) + sqr(c1.o.y - c2.o.y) - sqr(c1.r - c2.r)) <= 0;
 }
 
 inline double cross(point a, point b, point c) {
@@ -91,7 +94,9 @@ int main() {
       if (ip_circle_circle(*a, *b, p1, p2) >= 2) {
         events[en++] = event(angle(a->o, p1), -sign(cross(a->o, b->o, p1)), p1);
         events[en++] = event(angle(a->o, p2), -sign(cross(a->o, b->o, p2)), p2);
-        if ((events[en - 2].a < events[en - 1].a) ^ (events[en - 2].t > events[en - 1].t)) cover++;
+        if ((events[en - 2].a < events[en - 1].a) ^
+            (events[en - 2].t > events[en - 1].t))
+          cover++;
       }
     }
     sort(events, events + en);
