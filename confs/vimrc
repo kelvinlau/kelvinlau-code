@@ -4,31 +4,28 @@ set nocp nu ru bg=dark ai si et bs=2 fo+=ro is nohls
 set mouse=a aw ar wmnu nowrap nobackup noswf
 let &tenc=&enc
 set fencs=utf-8,gbk
+set ts=2 sw=2 sts=2
 
-set ts=4 sw=4 sts=4
-au FileType c,cpp,java,javascript setl cin ts=2 sw=2 sts=2
+au FileType c,cpp,java,javascript setl cin
 
 map <F3> :s!^!# !<CR>
 map <F4> :s!^# !!<CR>
 au FileType c,cpp,java,javascript map <buffer> <F3> :s!^!//!<CR>
 au FileType c,cpp,java,javascript map <buffer> <F4> :s!^//!!<CR>
 
-au FileType c setl mp=gcc\ %\ -o\ %:r\ -lm
-au FileType cpp setl mp=g++\ %\ -o\ %:r
-au FileType java setl mp=javac\ %
-au FileType python setl mp=pychecker\ %
-
-au FileType c,cpp map <buffer> <F5> :!./%:r<CR>
-au FileType c,cpp map <buffer> <C-F5> :!./%:r < %:r.in<CR>
-au FileType java map <buffer> <F5> :!java %:r<CR>
-au FileType java map <buffer> <C-F5> :!java %:r < %:r.in<CR>
-au FileType python map <buffer> <F5> :!python %<CR>
-au FileType python map <buffer> <C-F5> :!python % < %:r.in<CR>
-
-map <F9> :make<CR>
 " map <F2> ggVG"+y
 " vmap<F2> "+y
 map <F2> ggVG:!xclip -sel clip<CR>u
 vmap<F2> :!xclip -sel clip<CR>u
 map <C-h> gT
 map <C-l> gt
+
+map <Space>1 :tabfirst<CR>
+map <Space>2 :tabnext 2<CR>
+map <Space>3 :tabnext 3<CR>
+map <Space>4 :tabnext 4<CR>
+map <Space>5 :tabnext 5<CR>
+map <Space>6 :tabnext 6<CR>
+map <Space>7 :tabnext 7<CR>
+map <Space>8 :tabnext 8<CR>
+map <Space>9 :tablast<CR>
