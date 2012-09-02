@@ -1,5 +1,4 @@
-set rtp+=$GOROOT/misc/vim
-filetype plugin indent on
+filetype on
 syntax on
 set nocp nu ru bg=dark ai si et bs=2 fo+=ro is nohls
 set mouse=a aw ar wmnu nowrap nobackup noswf
