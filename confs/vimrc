@@ -1,4 +1,5 @@
-filetype on
+set rtp+=$GOROOT/misc/vim
+filetype plugin indent on
 syntax on
 set nocp nu ru bg=dark ai si et bs=2 fo+=ro is nohls
 set mouse=a aw ar wmnu nowrap nobackup noswf
@@ -18,6 +19,8 @@ au FileType c,cpp,java,javascript map <buffer> <F4> :s!^//!!<CR>
 " vmap<F2> "+y
 " map <F2> ggVG:!xclip -sel clip<CR>u
 " vmap<F2> :!xclip -sel clip<CR>u
+" map <F2> ggVG:!pbcopy<CR>u
+" vmap<F2> :!pbcopy<CR>u
 set pastetoggle=<F9>
 
 " tabs
