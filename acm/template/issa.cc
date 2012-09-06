@@ -14,7 +14,7 @@ const byte mask[] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
 void getBuckets(byte *s, int *bkt, int n, int K, int cs, bool end) {
   int i, sum = 0;
   for (i = 0; i <= K; i++)
-    bkt[i] = 0; 
+    bkt[i] = 0;
   for (i = 0; i < n; i++)
     bkt[chr(i)]++;
   for (i = 0; i <= K; i++) {
@@ -25,7 +25,7 @@ void getBuckets(byte *s, int *bkt, int n, int K, int cs, bool end) {
 
 void induceSAl(byte *t, int *SA, byte *s, int *bkt, int n, int K, int cs, bool end) {
   int i, j;
-  getBuckets(s, bkt, n, K, cs, end);  
+  getBuckets(s, bkt, n, K, cs, end);
   for (i = 0; i < n; i++) {
     j = SA[i] - 1;
     if (j >= 0 && !tget(j))
@@ -35,7 +35,7 @@ void induceSAl(byte *t, int *SA, byte *s, int *bkt, int n, int K, int cs, bool e
 
 void induceSAs(byte *t, int *SA, byte *s, int *bkt, int n, int K, int cs, bool end) {
   int i, j;
-  getBuckets(s, bkt, n, K, cs, end);  
+  getBuckets(s, bkt, n, K, cs, end);
   for (i = n - 1; i >= 0; i--) {
     j = SA[i] - 1;
     if (j >= 0 && tget(j))
@@ -45,15 +45,15 @@ void induceSAs(byte *t, int *SA, byte *s, int *bkt, int n, int K, int cs, bool e
 
 void issa(byte *s, int *SA, int n, int K, int cs) {
   int i, j;
-  byte *t = (byte *) malloc(n / 8 + 1);  
+  byte *t = (byte *) malloc(n / 8 + 1);
 
   tset(n - 2, 0);
-  tset(n - 1, 1);        
+  tset(n - 1, 1);
   for (i = n - 3; i >= 0; i--)
     tset(i, (chr(i) < chr(i + 1) || (chr(i) == chr(i + 1) && tget(i + 1) == 1)) ? 1 : 0);
 
-  int *bkt = (int *) malloc(sizeof(int) * (K + 1));  
-  getBuckets(s, bkt, n, K, cs, true);  
+  int *bkt = (int *) malloc(sizeof(int) * (K + 1));
+  getBuckets(s, bkt, n, K, cs, true);
   for (i = 0; i < n; i++)
     SA[i] = -1;
   for (i = 1; i < n; i++)
@@ -62,14 +62,14 @@ void issa(byte *s, int *SA, int n, int K, int cs) {
   induceSAl(t, SA, s, bkt, n, K, cs, false);
   induceSAs(t, SA, s, bkt, n, K, cs, true);
   free(bkt);
-  
+
   int n1 = 0;
   for (i = 0; i < n; i++)
     if (isLMS(SA[i]))
       SA[n1++] = SA[i];
-  
+
   for (i = n1; i < n; i++)
-    SA[i] = -1;        
+    SA[i] = -1;
   int name = 0, prev = -1;
   for (i = 0; i < n1; i++) {
     int pos = SA[i];
@@ -94,20 +94,20 @@ void issa(byte *s, int *SA, int n, int K, int cs) {
   int *SA1 = SA, *s1 = SA + n - n1;
   if (name < n1)
     issa((byte *) s1, SA1, n1, name - 1, sizeof(int));
-  else            
+  else
     for (i = 0; i < n1; i++)
       SA1[s1[i]] = i;
 
-  bkt = (int *) malloc(sizeof(int) * (K + 1));  
+  bkt = (int *) malloc(sizeof(int) * (K + 1));
 
-  getBuckets(s, bkt, n, K, cs, true);  
+  getBuckets(s, bkt, n, K, cs, true);
   for (i = 1, j = 0; i < n; i++)
     if (isLMS(i))
-      s1[j++] = i;    
+      s1[j++] = i;
   for (i = 0; i < n1; i++)
-    SA1[i] = s1[SA1[i]];  
+    SA1[i] = s1[SA1[i]];
   for (i = n1; i < n; i++)
-    SA[i] = -1;        
+    SA[i] = -1;
   for (i = n1 - 1; i >= 0; i--) {
     j = SA[i];
 

@@ -8,7 +8,7 @@ const int N = 1000010;
 int kmp(char *s, int n, char *t, int m) {
   static int next[N];
   int i, j;
-  
+
   next[0] = -1;
   i = 0; j = -1;
   while (i < m) {
@@ -19,7 +19,7 @@ int kmp(char *s, int n, char *t, int m) {
       j = next[j];
     }
   }
-  
+
   i = j = 0;
   while (i < n && j < m) {
     if (j == -1 || s[i] == t[j]) {

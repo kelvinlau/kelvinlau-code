@@ -105,7 +105,7 @@ void heap_init(int st, node *x) {
       }
     }
   }
-  
+
   /* init heap */
   for (int z = 0; z < t; z++) {
     int u = q[z];
@@ -135,7 +135,7 @@ void update(node *x) {
 node *divide(int rt) {
   /* find edge to cut */
   int bz, bv = -1, bu;
-  
+
   s = t = 0;
   q[t++] = rt;
 
@@ -158,7 +158,7 @@ node *divide(int rt) {
     x->le = rk[rt] = rkn++;
     return x;
   }
-  
+
   /* cut it */
   int sz = size[rt];
   ed[bz].a -= 2;
@@ -166,7 +166,7 @@ node *divide(int rt) {
   pnt[bv] = -1;
   for (int i = bu; i > -1; i = pnt[i])
     size[i] -= size[bv];
-  
+
   /* divide recursively */
   node *x = a + (m++);
   x->d = ed[bz].w;
@@ -224,14 +224,14 @@ int main() {
       } else ed[z].a = 0;
     }
   }
-  
+
   /* modify the tree to binary tree, so that it can be divided equally */
   while (t) {
     int u = q[--t];
 
     int dd = 0;
     for (int z = hd[u]; z > -1; z = ed[z].p) if (ed[z].a == 1) dd++;
-    
+
     int deg = 0, lz = -1, p = -1, pw = -1;
     for (int z = hd[u]; z > -1; z = ed[z].p) if (ed[z].a == 1) {
       deg++;
@@ -253,7 +253,7 @@ int main() {
         if (z != lz) ed[z].a = ed[z ^ 1].a = -1;
       add2(u, p, 0);
     }
-    
+
     size[u] = 1;
     for (int z = hd[u]; z > -1; z = ed[z].p) if (ed[z].a == 1) {
       int v = ed[z].v;

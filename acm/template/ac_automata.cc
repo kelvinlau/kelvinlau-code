@@ -85,7 +85,7 @@ char str[L];
 
 int main() {
   int T, n;
-  
+
   scanf("%d", &T);
   while (T--) {
     init();

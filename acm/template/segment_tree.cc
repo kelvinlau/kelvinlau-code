@@ -69,11 +69,11 @@ void change(int u, int v, int a, int b) {
 
 int main() {
   int n, m, q, i, a, b;
-  
+
   while (scanf("%d %d", &n, &m) != EOF) {
     memset(f, 0, sizeof(f));
     memset(g, 0, sizeof(g));
-    
+
     while (m--) {
       scanf("%d", &q);
       switch (q) {

@@ -8,12 +8,12 @@ using namespace std;
 
 const double eps = 1e-8, inf = 1e+9, pi = acos(-1.0);
 
-inline int sign(double x) { 
-  return x < -eps ? -1 : x > eps; 
+inline int sign(double x) {
+  return x < -eps ? -1 : x > eps;
 }
 
-inline double sqr(double x) { 
-  return x * x; 
+inline double sqr(double x) {
+  return x * x;
 }
 
 /* ---------- points ---------- */
@@ -22,11 +22,11 @@ struct point {
   double x, y;
   point(double x = 0, double y = 0) : x(x), y(y) {}
 
-  bool operator<(const point &p) const { 
-    return sign(x - p.x) * 2 + sign(y - p.y) < 0; 
+  bool operator<(const point &p) const {
+    return sign(x - p.x) * 2 + sign(y - p.y) < 0;
   }
-  bool operator==(const point &p) const { 
-    return !sign(x - p.x) && !sign(y - p.y); 
+  bool operator==(const point &p) const {
+    return !sign(x - p.x) && !sign(y - p.y);
   }
 };
 
@@ -57,7 +57,7 @@ point mp(point a, point b) {
   return point((a.x + b.x) / 2, (a.y + b.y) / 2);
 }
 
-/* next point */ 
+/* next point */
 point np(point a, double alpha, double d) {
   return point(a.x + d * cos(alpha), a.y + d * sin(alpha));
 }
@@ -121,7 +121,7 @@ double area_polygon(point a[], int n) {
 point centroid(point a[], int n) {
   double area = 0;
   point c;
-  
+
   for (int i = 0; i < n; i++) {
     int j = (i + 1) % n;
     area += a[i].x * a[j].y - a[i].y * a[j].x;
@@ -148,7 +148,7 @@ bool acmp(point a, point b) {
 int find_convex(point p[], int n) {
   __o = *min_element(p, p + n);
   sort(p, p + n, acmp);
-  
+
   int top = 0;
   point *stack = (point *)malloc(sizeof(point) * n); // XXX malloc!
 
@@ -267,7 +267,7 @@ double dist_line_point(line l, point a) {
 
 double dist_lineseg_point(line l, point a) {
   if (on_lineseg(l, a)) return 0;
-  if (on_line(l, a) || !sharp(l.p, a, l.q)) 
+  if (on_line(l, a) || !sharp(l.p, a, l.q))
     return min(dist(l.p, a), dist(l.q, a));
   return dist_line_point(l, a);
 }
@@ -305,7 +305,7 @@ int lineseg_inside_polygon(point p[], int n, line l) {
 /* if lineseg l intersect convex polygon p[n] */
 int intersect_convex_lineseg(point p[], int n, line l) {
   if (n < 3) return 0;
-  
+
   point q[4]; int k = 0;
   q[k++] = l.p;
   q[k++] = l.q;
@@ -319,7 +319,7 @@ int intersect_convex_lineseg(point p[], int n, line l) {
       if (on_lineseg(l, X) && on_lineseg(a, X)) q[k++] = X;
     }
   }
-  
+
   sort(q, q + k);
   for (int i = 0; i + 1 < k; i++) {
     if (inside_polygon(p, n, mp(q[i], q[i + 1]))) return 1;
@@ -340,19 +340,19 @@ point mirror(line l, point a) {
   return point(p.x * 2 - a.x, p.y * 2 - a.y);
 }
 
-point perpencenter(point a, point b, point c) {    
+point perpencenter(point a, point b, point c) {
   line u = perpendicular(line(b, c), a);
-  line v = perpendicular(line(a, c), b);  
+  line v = perpendicular(line(a, c), b);
   return ip(u, v);
 }
 
 /* Inscribed circle center */
 point icc(point A, point B, point C) {
-  double a = dist(B, C), b = dist(C, A), c = dist(A, B), 
-         p = (a + b + c) / 2, 
+  double a = dist(B, C), b = dist(C, A), c = dist(A, B),
+         p = (a + b + c) / 2,
          s = sqrt(p * (p - a) * (p - b) * (p - c));
   point cp;
-  cp.x = (a * A.x + b * B.x + c * C.x) / (a + b + c); 
+  cp.x = (a * A.x + b * B.x + c * C.x) / (a + b + c);
   cp.y = (a * A.y + b * B.y + c * C.y) / (a + b + c);
   return cp;
 }
@@ -368,7 +368,7 @@ point ccc(point A, point B, point C) {
   double a2 = C.x - A.x, b2 = C.y - A.y, c2 = (sqr(a2) + sqr(b2)) / 2;
   double d = a1 * b2 - a2 * b1;
   point cp;
-  cp.x = A.x + (c1 * b2 - c2 * b1) / d; 
+  cp.x = A.x + (c1 * b2 - c2 * b1) / d;
   cp.y = A.y + (a1 * c2 - a2 * c1) / d;
   return cp;
 }
@@ -442,7 +442,7 @@ void triangulate(point p[], int n, triangle T[]) {
   int m = 0;
   if (P.size() < 3) return;
 
-  for (a = b = P.begin(), c = ++b, ++c; c != P.end(); a = b, c = ++b, ++c) 
+  for (a = b = P.begin(), c = ++b, ++c; c != P.end(); a = b, c = ++b, ++c)
     if (sign(cross(*a, *b, *c)) > 0) {
       for (q = P.begin(); q != P.end(); q++) {
         if (q == a) { ++q; ++q; continue; }
@@ -453,7 +453,7 @@ void triangulate(point p[], int n, triangle T[]) {
         t.p[1] = *b;
         t.p[2] = *c;
         T[m++] = t;
-        
+
         P.erase(b);
         b = a;
         if (b != P.begin()) b--;
@@ -468,7 +468,7 @@ bool acmp1(point a, point b) {
 }
 
 double triangles_intersection(triangle a, triangle b) {
-  point p[15]; 
+  point p[15];
   int n = 0;
   triangle T[2] = { a, b };
 
@@ -476,7 +476,7 @@ double triangles_intersection(triangle a, triangle b) {
     for (int i = 0; i < 3; i++)
       if (inside_triangle_exclusive(T[t].p[0], T[t].p[1], T[t].p[2], T[!t].p[i]))
         p[n++] = T[!t].p[i];
-  
+
   for (int i = 0; i < 3; i++)
     for (int j = 0; j < 3; j++) {
       line l1(T[0].p[i], T[0].p[(i + 1) % 3]);
@@ -492,7 +492,7 @@ double triangles_intersection(triangle a, triangle b) {
 
   if (n < 3)
     return 0.0;
-  
+
   o1 = p[0];
   sort(p + 1, p + n, acmp1);
   return area_polygon(p, n);
@@ -544,7 +544,7 @@ int ip_convex(line l[], int n, point p[]) {
   }
   n = n1;
 
-  l[n + 0] = l[0]; 
+  l[n + 0] = l[0];
   l[n + 1] = l[1];
 
   int m = 0;
@@ -575,12 +575,12 @@ int ip_circle_line(circle c, line l, point &p1, point &p2) {
   double dx = b.x - a.x, dy = b.y - a.y;
   double sdr = sqr(dx) + sqr(dy), dr = sqrt(sdr);
   double d, disc, x, y;
-  
+
   a.x -= c.o.x; a.y -= c.o.y;
   b.x -= c.o.x; b.y -= c.o.y;
   d = a.x * b.y - b.x * a.y;
   disc = sqr(c.r) * sdr - sqr(d);
-  
+
   if (disc < -eps) return 0;
   if (disc < +eps) disc = 0; else disc = sqrt(disc);
   x = disc * dx * (dy > 0 ? 1 : -1);

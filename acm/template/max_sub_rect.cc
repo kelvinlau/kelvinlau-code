@@ -19,7 +19,7 @@ int main() {
     lc[0] = rc[m+1] = 0;
     for (j = m; j >= 1; j--)
       rc[j] = (a[i][j] ? rc[j+1]+1 : 0);
-    
+
     for (j = 1; j <= m; j++) {
       if (!a[i][j]) {
         tc[j] = lc[j] = 0;
@@ -29,7 +29,7 @@ int main() {
         lc[j] = lc[j-1] + 1;
         ll[j] = min(ll[j], lc[j]);
         rr[j] = min(rr[j], rc[j]);
-        
+
         l = j - ll[j] + 1;
         r = j + rr[j] - 1;
         u = i - tc[j] + 1;

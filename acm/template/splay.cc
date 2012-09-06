@@ -50,7 +50,7 @@ inline void lr(node *x) {
 
   x->r = b;
   if (b) b->p = x;
-  
+
   y->p = x->p;
   if (x->p) {
     if (x->p->l == x)
@@ -58,10 +58,10 @@ inline void lr(node *x) {
     else
       x->p->r = y;
   }
-  
+
   y->l = x;
   x->p = y;
-  
+
   up(x);
   up(y);
 }
@@ -72,7 +72,7 @@ inline void rr(node *x) {
 
   x->l = b;
   if (b) b->p = x;
-  
+
   y->p = x->p;
   if (x->p) {
     if (x->p->l == x)
@@ -80,10 +80,10 @@ inline void rr(node *x) {
     else
       x->p->r = y;
   }
-  
+
   y->r = x;
   x->p = y;
-  
+
   up(x);
   up(y);
 }
@@ -94,9 +94,9 @@ void splay(node *x) {
   while (p = x->p) {
     down(p); // sometimes not necessary
     down(x); //
-    if (p->l == x) 
-      rr(p); 
-    else 
+    if (p->l == x)
+      rr(p);
+    else
       lr(p);
   }
 }
@@ -157,7 +157,7 @@ node *join(node *y, node *x) {
   return x;
 }
 
-/* cut out the [u, v) subtree, reverse it, put it back to the end of the tree, 
+/* cut out the [u, v) subtree, reverse it, put it back to the end of the tree,
  * returns new root */
 node *doit(node *root, int u, int v) {
   node *b = kth(root, u);

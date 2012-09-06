@@ -9,19 +9,19 @@ const int INTMIN = 0x80000000;
 typedef long long ll;
 
 int x, ok;
-struct Token { 
+struct Token {
   int t, val;
 } lookahead;
 
-inline bool fit(ll x) { 
-  return INTMIN <= x && x <= INTMAX; 
+inline bool fit(ll x) {
+  return INTMIN <= x && x <= INTMAX;
 }
 
 Token next_token() {
   Token tok;
   ll val;
 
-  while (isspace(x)) 
+  while (isspace(x))
     x = getchar();
 
   if (x == EOF) {
@@ -34,7 +34,7 @@ Token next_token() {
     x = getchar();
     return tok;
   }
-  
+
   for (val = 0; isdigit(x); x = getchar()) {
     val = val * 10 + x - '0';
     ok &= fit(val);
@@ -44,12 +44,12 @@ Token next_token() {
   return tok;
 }
 
-inline void shift() { 
-  lookahead = next_token(); 
+inline void shift() {
+  lookahead = next_token();
 }
 
 void init() {
-  x = getchar(); 
+  x = getchar();
   shift();
 }
 
@@ -74,7 +74,7 @@ int exp() {
     } else if (match('-')) {
       ans -= term();
     } else break;
-    
+
     ok &= fit(ans);
   }
   return (int)ans;
@@ -106,7 +106,7 @@ int pow(int x, int y) {
   if (x == 0 && y == 0 || y < 0) return ok = 0;
   if (x == 0 || x == 1) return x;
   if (x == -1) y %= 2;
-  
+
   while (y--) {
     r *= x;
     if (!fit(r))

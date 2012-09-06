@@ -3,9 +3,9 @@
 #include <algorithm>
 using namespace std;
 
-const int N = 9; 
-const int B = 3; 
-const int R = N * N * N + 5; 
+const int N = 9;
+const int B = 3;
+const int R = N * N * N + 5;
 const int C = N * N * 4 + 5;
 const int Z = R * 4 + C + 5;
 

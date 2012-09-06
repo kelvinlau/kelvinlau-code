@@ -7,12 +7,12 @@ using namespace std;
 const int N = 100010;
 const double eps = 1e-8;
 
-inline int sign(double x) { 
-  return x < -eps ? -1 : x > eps; 
+inline int sign(double x) {
+  return x < -eps ? -1 : x > eps;
 }
 
-struct point { 
-  double x, y; 
+struct point {
+  double x, y;
   point(double x = 0, double y = 0) : x(x), y(y) {}
 };
 
@@ -72,7 +72,7 @@ void find_half_plane(line l[], int n, point p[], int &m) {
     while (t - s > 1 && !in_hp(*dq[t - 1], ip(*dq[s], *dq[s + 1]))) s++, c = 1;
     while (t - s > 1 && !in_hp(*dq[s], ip(*dq[t - 2], *dq[t - 1]))) t--, c = 1;
   }
-  
+
   dq[t] = dq[s];
   for (int i = 0; i < t - s; i++) {
     p[i] = ip(*dq[s + i], *dq[s + i + 1]);

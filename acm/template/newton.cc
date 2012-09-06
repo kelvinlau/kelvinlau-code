@@ -15,14 +15,14 @@ inline ll modular(ll x, ll y) {
   return (x % y + y) % y;
 }
 
-ll exgcd(ll m, ll n, ll &a, ll &b) { 
+ll exgcd(ll m, ll n, ll &a, ll &b) {
   if (!n) return a = 1, b = 0, m;
   ll d = exgcd(n, m % n, b, a);
   b -= m / n * a;
   return d;
 }
 
-ll invert(ll x, ll m)  { 
+ll invert(ll x, ll m)  {
   ll a, b;
   exgcd(x, m, a, b);
   return modular(a, m);

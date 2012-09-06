@@ -23,7 +23,7 @@ void init() {
 void factorize1(int n, int p[], int k[], int &m) {
   for (m = 0; n > 1; m++) {
     p[m] = fp[n], k[m] = 0;
-    while (n % p[m] == 0) 
+    while (n % p[m] == 0)
       n /= p[m], k[m]++;
   }
 }
@@ -41,7 +41,7 @@ void factorize(int n, int p[], int k[], int &m) {
   if (n < M)
     for (; n > 1; m++) {
       p[m] = fp[n], k[m] = 0;
-      while (n % p[m] == 0) 
+      while (n % p[m] == 0)
         n /= p[m], k[m]++;
     }
   if (n > 1)

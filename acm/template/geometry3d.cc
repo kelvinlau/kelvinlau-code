@@ -110,8 +110,8 @@ int on_seg(point p, point q, point A) {
 }
 
 /* relation of C & D based on AB
- * same side:     +1; 
- * opposite side: -1; 
+ * same side:     +1;
+ * opposite side: -1;
  * otherwise:      0 */
 inline int side(point A, point B, point C, point D) {
   return sign(((A - B) * (C - A)) ^ ((A - B) * (D - A)));
@@ -217,9 +217,9 @@ int ip_ball_line(point o, double r, point p, point q, point &a, point &b) {
   return 1;
 }
 
-/* Given the latitude and longitude of two points in degrees, 
- * calculates the distance over the sphere between them. 
- * Latitude is given in the range [-pi/2, pi/2] degrees, 
+/* Given the latitude and longitude of two points in degrees,
+ * calculates the distance over the sphere between them.
+ * Latitude is given in the range [-pi/2, pi/2] degrees,
  * Longitude is given in the range [-pi,pi] degrees.
  */
 double greatcircle(double lat1, double long1, double lat2, double long2) {
@@ -250,7 +250,7 @@ double det(double m[4][4], int n) {
 }
 
 /* Given 4 points:
- * Returns 0 if the points are coplanar 
+ * Returns 0 if the points are coplanar
  * Returns 1 if the points are not coplanar with:
  *   o = center of sphere
  *   r = radius of sphere
@@ -342,7 +342,7 @@ vector normal(point *p, int n) {
 /* check if 2 polygons p[n] & q[m] touched with each other */
 int touched_polygons(point *p, int n, point *q, int m) {
   vector norm;
-  
+
   norm = normal(q, m);
   for (int i = 0; i < n; i++)
     if (intersected_polygon_seg(q, m, norm, p[i], p[i + 1])) return 1;

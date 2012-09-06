@@ -51,7 +51,7 @@ void add(int m, matrix C, matrix A, matrix B) {
 }
 
 /* D = I + A + A ^ 2 + ... + A ^ (k - 1) */
-void pow_sig(int m, matrix D, matrix A, int k) { 
+void pow_sig(int m, matrix D, matrix A, int k) {
   static matrix B, C, T;
   for (init(m, B, 1), init(m, C, 1), init(m, D, 0); k; k >>= 1) {
     if (k & 1) {
@@ -66,7 +66,7 @@ void pow_sig(int m, matrix D, matrix A, int k) {
 }
 
 int main() {
-  int n; 
+  int n;
   while (~scanf("%d", &n)) {
     matrix A = {
       { 0, 1 },

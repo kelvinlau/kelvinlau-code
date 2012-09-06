@@ -1,5 +1,5 @@
-/* Given n circles and a rectangle, find the area of intersection of 
- * the rectangle and the union of these circles 
+/* Given n circles and a rectangle, find the area of intersection of
+ * the rectangle and the union of these circles
  * O(n ^ 3) */
 #include <stdio.h>
 #include <string.h>
@@ -90,7 +90,7 @@ bool operator<(const arc &a, const arc &b) {
 
 const int N = 200 + 10;
 
-circle c[N]; 
+circle c[N];
 int n, n1, n2;
 double ys[N * N + N * 7 + 2];
 int ysn;
@@ -188,7 +188,7 @@ int main() {
 
     double ans = 0;
     for (int i = 0; i + 1 < ysn; i++)
-      if (sign(0 - ys[i]) <= 0 && sign(ys[i + 1] - Y) <= 0) 
+      if (sign(0 - ys[i]) <= 0 && sign(ys[i + 1] - Y) <= 0)
         ans += solve(ys[i], ys[i + 1]);
     printf("%.2lf\n", X * Y - ans + eps);
   }

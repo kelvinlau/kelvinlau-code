@@ -52,7 +52,7 @@ void mark(int u, int c) {
 
 int main() {
   int u, v, c;
-  
+
   init();
   scanf("%d %d", &n, &m);
   while (m--) {
@@ -60,16 +60,16 @@ int main() {
     add(u, v);
     add(v, u);
   }
-  
+
   memset(vt, 0, sizeof vt);
   memset(cut, 0, sizeof cut);
   dfs(root = 0, -1, 0);
-  
+
   c = 0;
   memset(vt, -1, sizeof vt);
   for (u = 0; u < n; u++)
     if (vt[u] == -1)
       mark(u, c++);
-  
+
   return 0;
 }

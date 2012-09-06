@@ -22,7 +22,7 @@ void init(int n) {
 
 int jump(int v, int d) {
   int i;
-  
+
   for (i = 0; d; i++) {
     if (d & 1) v = pnt[v][i];
     d >>= 1;
@@ -32,7 +32,7 @@ int jump(int v, int d) {
 
 int lca(int u, int v) {
   int i, d, x, y;
-  
+
   if (h[u] > h[v]) swap(u, v);
 
   v = jump(v, h[v] - h[u]);

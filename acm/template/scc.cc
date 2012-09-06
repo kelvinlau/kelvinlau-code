@@ -35,17 +35,17 @@ int main() {
     vout1[u].push_back(v);
     vout2[v].push_back(u);
   }
-    
+
   top = 0;
   memset(mark, 0, n * sizeof(mark[0]));
   for (int u = 0; u < n; u++)
     if (!mark[u]) dfs1(u);
-  
+
   c = 0;
   while (top) {
     int u = stack[--top];
     if (mark[u] == -1) dfs2(u, c++);
   }
-  
+
   return 0;
 }

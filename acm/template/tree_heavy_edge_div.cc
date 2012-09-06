@@ -51,14 +51,14 @@ void dfs(int u) {
   path[hv][0] = path[u][0];
   dfs(hv);
   path[u][1] = path[hv][1];
-  
+
   for (i = first[u]; i > -1; i = next[i]) {
     v = vout[i];
     if (v != hv && pnt[v] == u) {
       path[v][0] = v;
       dfs(v);
     }
-  }  
+  }
 }
 
 #define id  ((u + v) | (u < v))
@@ -130,7 +130,7 @@ int findmax(int u, int v, int& lca) {
       v = pnt[x];
     }
   }
-  
+
   lca = v;
   res = max(res, val[lca]);
   return res;
@@ -163,7 +163,7 @@ int findsum(int u, int v, int& lca) {
 int main() {
   int i, u, v, q, lca, ans;
   char cmd[10];
-  
+
   while (scanf("%d", &n) != EOF) {
     m = 0;
     fill(first, first + n, -1);
@@ -183,14 +183,14 @@ int main() {
     m = 0;
     path[0][0] = 0;
     dfs(0);
-    
+
     for (i = 0; i < n; i++) {
       u = path[i][0];
       v = path[i][1];
       if (u == i && u != v)
         tbuild(pos[u], pos[v]);
     }
-    
+
     scanf("%d", &q);
     while (q--) {
       scanf("%s %d %d", cmd, &u, &v);

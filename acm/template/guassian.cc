@@ -13,7 +13,7 @@ void print(double a[N][N], int n) {
   puts("");
 }
 
-int guassian(double a[N][N], int n) {  
+int guassian(double a[N][N], int n) {
   int x, y, i, j, bx;
   for (x = y = 0; x < n && y <= n; y++, x++) {
     for (; y <= n; y++) {

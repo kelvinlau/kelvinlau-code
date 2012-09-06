@@ -1,4 +1,4 @@
-/* MIPT Range Query 
+/* MIPT Range Query
  * surport 3 types of operations:
  *   add x, y
  *   delete x, y
@@ -130,7 +130,7 @@ inline int inside(node *u, int x, int y) {
 void change(node *u, int x, int y, int d) {
   while (1) {
     u->s += d;
-    if (leaf(u)) 
+    if (leaf(u))
       break;
     if (u->l && inside(u->l, x, y))
       u = u->l;

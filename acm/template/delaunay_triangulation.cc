@@ -49,7 +49,7 @@ int nfree, N, M;
 void Alloc_memory() {
   nfree = 3 * N;
   edge *e = mem;
-  for (int i = 0; i < nfree; ++i) 
+  for (int i = 0; i < nfree; ++i)
     elist[i] = e++;
 }
 
@@ -65,7 +65,7 @@ void Splice(edge *a, edge *b, point *v) {
 
 edge *Make_edge(point *u, point *v) {
   edge *e = elist[--nfree];
-  e->on = e->op = e->dn = e->dp = e; 
+  e->on = e->op = e->dn = e->dp = e;
   e->oi = u; e->dt = v;
   if (u->in == NULL) u->in = e;
   if (v->in == NULL) v->in = e;
@@ -198,8 +198,8 @@ void Divide(int s, int t, edge **L, edge **R) {
 
 const double INF = 1e+9;
 int tn, cn;
-struct triangle { 
-  point *a, *b, *c; 
+struct triangle {
+  point *a, *b, *c;
 } tri[MAXN << 1];
 point *cycle[MAXN];
 
@@ -243,7 +243,7 @@ int main() {
     p[i].in = NULL;
 
   sort(p, p + N);
-  for (int i = 0; i < N; i++) 
+  for (int i = 0; i < N; i++)
     Q[i] = p + i;
 
   Alloc_memory();

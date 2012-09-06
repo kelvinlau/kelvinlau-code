@@ -10,7 +10,7 @@ typedef int T;
 const int N = 1000010;
 
 struct node {
-  T d; 
+  T d;
   int t, s;
   node *p, *l, *r;
 } nodes[N], *next_alloc;
@@ -102,11 +102,11 @@ node *insert(node *p, T d) {
 
 node *kth(node *p, int k) {
   while (p) {
-    if (k == size(p->l)) 
+    if (k == size(p->l))
       return p;
-    if (k < size(p->l)) 
+    if (k < size(p->l))
       p = p->l;
-    else 
+    else
       k -= size(p->l) + 1, p = p->r;
   }
   return NULL;
@@ -136,7 +136,7 @@ node *lower_bound(node *x, T d) {
   node *y;
   if (!x)
     return NULL;
-  if (d <= x->d && (y = lower_bound(x->l, d))) 
+  if (d <= x->d && (y = lower_bound(x->l, d)))
     return y;
   if (d <= x->d)
     return x;
@@ -147,7 +147,7 @@ node *upper_bound(node *x, T d) {
   node *y;
   if (!x)
     return NULL;
-  if (d < x->d && (y = upper_bound(x->l, d))) 
+  if (d < x->d && (y = upper_bound(x->l, d)))
     return y;
   if (d < x->d)
     return x;
