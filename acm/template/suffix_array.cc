@@ -5,18 +5,18 @@ using namespace std;
 
 char *_str;
 
-bool cmp(int x, int y) { 
-  return _str[x] < _str[y]; 
+bool cmp(int x, int y) {
+  return _str[x] < _str[y];
 }
 
 inline int sv(int n, int *rk, int k) { return k < n ? rk[k] + 1 : 0; }
 
 void suffix_array(char *str, int *sa, int *ht, int *rk, int *h) {
   int i, j, t, k, n = strlen(str);
-  
+
   for (i = 0; i < n; i++) sa[i] = i;
   _str = str; sort(sa, sa + n, cmp);
-  
+
   for (i = j = 0; i < n; i = j)
     while (j < n && str[sa[i]] == str[sa[j]])
       rk[sa[j++]] = i;
@@ -33,7 +33,8 @@ void suffix_array(char *str, int *sa, int *ht, int *rk, int *h) {
     for (i = n - 1; i >= 0; i--) sa[--h[rk[ht[i]]]] = ht[i];
 
     for (i = j = 0; i < n; i = j)
-      while (j < n && rk[sa[i]] == rk[sa[j]] && sv(n, rk, sa[i] + k) == sv(n, rk, sa[j] + k))
+      while (j < n && rk[sa[i]] == rk[sa[j]] &&
+             sv(n, rk, sa[i] + k) == sv(n, rk, sa[j] + k))
         ht[sa[j++]] = i;
     swap(ht, rk);
   }
@@ -60,9 +61,9 @@ int sa[N], ht[N], rk[N], h[N];
 int main() {
   scanf("%s", str);
   suffix_array(str, sa, ht, rk, h);
-  
+
   for (int i = 0; str[i]; i++)
     printf("%d %s\n", ht[i], &str[sa[i]]);
-  
+
   return 0;
 }

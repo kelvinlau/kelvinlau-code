@@ -6,16 +6,16 @@ using namespace std;
 
 typedef long long ll;
 
-ll gcd(ll x, ll y) { 
+ll gcd(ll x, ll y) {
   return !y ? x : gcd(y, x % y);
 }
 
-ll modular(ll a, ll b) { 
-  return (a % b + b) % b; 
+ll modular(ll a, ll b) {
+  return (a % b + b) % b;
 }
 
 /** m * a + n * b == gcd(m, n) */
-ll exgcd(ll m, ll n, ll &a, ll &b) { 
+ll exgcd(ll m, ll n, ll &a, ll &b) {
   if (!n)
     return a = 1, b = 0, m;
 
@@ -25,14 +25,14 @@ ll exgcd(ll m, ll n, ll &a, ll &b) {
 }
 
 /** x * y % m == 1 */
-ll invert(ll x, ll m)  { 
+ll invert(ll x, ll m)  {
   ll a, b;
   exgcd(x, m, a, b);
   return modular(a, m);
 }
 
 /** x % m == a && x % n == b */
-ll modular_system(ll m, ll a, ll n, ll b) { 
+ll modular_system(ll m, ll a, ll n, ll b) {
   ll g, k, l;
 
   g = exgcd(m, n, k, l);
@@ -53,7 +53,7 @@ ll modular_system_array(ll m[], ll r[], int k) {
 }
 
 /** a * x % m == b */
-ll modular_equation(ll a, ll m, ll b) { 
+ll modular_equation(ll a, ll m, ll b) {
   return modular_system(m, b, a, 0) / a % m;
 }
 

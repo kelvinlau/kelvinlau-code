@@ -1,4 +1,4 @@
-/* MIPT Range Query 
+/* MIPT Range Query
  * surport 3 types of operations:
  *   add x, y
  *   delete x, y
@@ -23,11 +23,11 @@ bool operator==(point p, point q) {
 }
 
 bool xcmp(point *a, point *b) {
-  return a->x < b->x || a->x == b->x && a->y < b->y; 
+  return a->x < b->x || a->x == b->x && a->y < b->y;
 }
 
 bool ycmp(point *a, point *b) {
-  return a->y < b->y || a->y == b->y && a->x < b->x; 
+  return a->y < b->y || a->y == b->y && a->x < b->x;
 }
 
 /*********** binary indexed tree ***********/
@@ -116,7 +116,7 @@ node *__build(point **xl, point **yl, point **yt, int n) {
   return p;
 }
 
-/* NOTE: no duplicated points are allowed 
+/* NOTE: no duplicated points are allowed
  *       only one range_tree can be maintained at a time */
 range_tree *range_tree_build(point *p, int n) {
   static range_tree __rt;
@@ -147,7 +147,7 @@ int __query(node *p, int x1, int x2, int lb, int ub) {
   if (x1 <= p->x1 && p->x2 <= x2)
     return ta_sum(p->ta, p->size, ub) - ta_sum(p->ta, p->size, lb);
 
-  return __query(p->l, x1, x2, p->la[lb], p->la[ub]) + 
+  return __query(p->l, x1, x2, p->la[lb], p->la[ub]) +
          __query(p->r, x1, x2, p->lb[lb], p->lb[ub]);
 }
 
@@ -158,7 +158,7 @@ int range_tree_query(range_tree *rt, int x1, int x2, int y1, int y2) {
 
   if (!root) return 0;
 
-  a.x = -INF; a.y = y1; 
+  a.x = -INF; a.y = y1;
   b.x = +INF; b.y = y2;
   lb = lower_bound(rt->yl, rt->yl + rt->size, &a, ycmp) - rt->yl;
   ub = upper_bound(rt->yl, rt->yl + rt->size, &b, ycmp) - rt->yl;

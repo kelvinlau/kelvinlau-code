@@ -4,7 +4,7 @@
 using namespace std;
 
 const int N = 50;
-const int R = N; 
+const int R = N;
 const int C = 64
 const int Z = R * C;
 

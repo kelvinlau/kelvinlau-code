@@ -31,8 +31,8 @@ int min_cost_max_flow(int s, int t) {
   while (1) {
     memset(in, 0, sizeof in);
     memset(prev, 0xff, sizeof prev);
-    memset(best, 0x3f, sizeof best); 
-    
+    memset(best, 0x3f, sizeof best);
+
     a = b = best[s] = 0;
     in[q[b++] = s] = 1;
     while (a != b) {
@@ -51,14 +51,14 @@ int min_cost_max_flow(int s, int t) {
       }
     }
     if (prev[t] == -1) break;
-    
+
     d = INF;
     for (v = t; v != s; v = ed[e].u) {
       e = prev[v];
       d = min(d, ed[e].f);
     }
     flow += d;
-    
+
     for (v = t, e; v != s; v = ed[e].u) {
       e = prev[v];
       ed[e ^ 0].f -= d;

@@ -13,8 +13,8 @@ typedef T vector[M];
 
 const T eps = 1e-4, pi = acos(-1.0);
 
-inline int sign(T x) { 
-  return x < -eps ? -1 : x > eps; 
+inline int sign(T x) {
+  return x < -eps ? -1 : x > eps;
 }
 
 inline T sqr(T x) {

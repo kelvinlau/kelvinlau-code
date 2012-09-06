@@ -10,7 +10,7 @@ int low[N][N], net[N][N];
 int max_flow(int s, int t, int n) {
   static int q[N], pv[N];
   int a, b, i, d, u, v, res;
-  
+
   res = 0;
   while (1) {
     a = b = 0;
@@ -46,7 +46,7 @@ int max_flow(int s, int t, int n) {
 
 int limited_min_flow(int s, int t, int n) {
   int x, y, i, j, a, b, res;
-  
+
   x = n;
   y = n + 1;
   for (i = 0; i < n; i++)
@@ -55,11 +55,11 @@ int limited_min_flow(int s, int t, int n) {
     net[i][y] += low[i][j];
     net[i][j] -= low[i][j];
   }
-  
+
   res = 0;
   for (i = 0; i < n; i++)
     res += net[s][i] + low[s][i];  // be aware of overflow
-  
+
   a = net[s][t];
   b = net[t][s]; net[t][s] = inf;
   max_flow(x, y, n + 2);
@@ -69,11 +69,11 @@ int limited_min_flow(int s, int t, int n) {
 
   net[s][t] = a;
   net[t][s] = b;
-  
+
   max_flow(t, s, n);
-  
+
   for (i = 0; i < n; i++)
     res -= net[s][i];
-  
+
   return res;
 }

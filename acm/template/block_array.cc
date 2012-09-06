@@ -38,7 +38,7 @@ int main() {
       line[m].x1 = x1;
       line[m].x2 = x2;
       line[m++].t = +1;
-      
+
       line[m].y = y2;
       line[m].x1 = x1;
       line[m].x2 = x2;
@@ -48,7 +48,7 @@ int main() {
       dx[k++] = x2;
     }
     scanf("%d", &cover);
-  
+
     sort(dx, dx + k);
     k = unique(dx, dx + k) - dx;
     for (w = 1; w * w < k; w++);
@@ -58,24 +58,24 @@ int main() {
 
     memset(cov, 0, sizeof(cov));
     memset(f, 0, sizeof(f));
-    
+
     for (j = 0; j * w < k - 1; j++) {
       a = j * w;
       b = min(a + w, k - 1);
       g[j][0] = dx[b] - dx[a];
-      
+
       for (i = 1; i <= cover; i++)
         g[j][i] = 0;
     }
-    
+
     sort(line, line + m, cmp);
-    
+
     area = 0;
     for (i = 0; i < m - 1; i++) {
       x1 = line[i].x1;
       x2 = line[i].x2;
       t = line[i].t;
-      
+
       a = lower_bound(dx, dx + k, x1) - dx;
       d = lower_bound(dx, dx + k, x2) - dx;
       b = (a + w - 1) / w * w;
@@ -102,6 +102,6 @@ int main() {
     }
     printf("%lld\n", area);
   }
-  
+
   return 0;
 }

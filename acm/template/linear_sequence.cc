@@ -1,5 +1,5 @@
-/* f[i] = a[i], i < m; 
- * f[n] = b[0] * f[n - m] + ... + b[m - 1] * f[n - 1]; 
+/* f[i] = a[i], i < m;
+ * f[n] = b[0] * f[n - m] + ... + b[m - 1] * f[n - 1];
  * given a[], b[], m, n; find f[n]
  * O(M ^ 2 log N) */
 #include <stdio.h>

@@ -8,12 +8,12 @@ using namespace std;
 const int N = 100010;
 const double eps = 1e-8;
 
-inline int sign(double x) { 
-  return x < -eps ? -1 : x > eps; 
+inline int sign(double x) {
+  return x < -eps ? -1 : x > eps;
 }
 
 struct point {
-  double x, y; 
+  double x, y;
   point(double x = 0, double y = 0) : x(x), y(y) {}
 };
 

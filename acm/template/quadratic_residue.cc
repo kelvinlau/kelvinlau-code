@@ -11,7 +11,7 @@ int euler(int a, int p) {
     k = (k >> 1);
   }
   return ret != 1 ? 0 : 2;
-}    
+}
 
 
 int cal(int p, int n, int d) {
@@ -75,7 +75,7 @@ int solve(int m, int d) {
     ret *= cal(m, 1, d);
   return ret;
 }
-    
+
 int main() {
   int m, d;
   while (scanf("%d %d", &m, &d) != EOF) {

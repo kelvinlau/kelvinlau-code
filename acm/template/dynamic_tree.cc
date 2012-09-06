@@ -13,7 +13,7 @@ struct node {
 inline node *up(node *x) {
   node *l = x->l;
   node *r = x->r;
-  x->g = max((l ? max(l->w, l->g) + l->f : 0), 
+  x->g = max((l ? max(l->w, l->g) + l->f : 0),
              (r ? max(r->w, r->g) + r->f : 0));
   return x;
 }
@@ -38,7 +38,7 @@ inline node *down(node *x) {
 inline void lr(node *x) {
   node *y = x->r;
   node *b = y->l;
-  if (x->r = b) 
+  if (x->r = b)
     b->p = x;
   y->p = x->p;
   if (x->p) {
@@ -57,7 +57,7 @@ inline void lr(node *x) {
 inline void rr(node *x) {
   node *y = x->l;
   node *b = y->r;
-  if (x->l = b) 
+  if (x->l = b)
     b->p = x;
   y->p = x->p;
   if (x->p) {
@@ -76,11 +76,11 @@ inline void rr(node *x) {
 void splay(node *x) {
   node *p;
   while (p = x->p) {
-    down(p); 
+    down(p);
     down(x);
-    if (p->l == x) 
-      rr(p); 
-    else 
+    if (p->l == x)
+      rr(p);
+    else
       lr(p);
   }
   down(x);
@@ -134,7 +134,7 @@ void join(node *u, node *v) {
 }
 
 /* root of x */
-node *root(node *x) {  
+node *root(node *x) {
   access(x);
   while (down(x)->l) x = x->l;
   return x;

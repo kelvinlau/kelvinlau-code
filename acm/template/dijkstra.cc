@@ -8,14 +8,14 @@ const int M = 200010;
 const int INF = 0x3f3f3f3f;
 
 int n, en, hd[N];
-struct edge { 
-  int v, w, p; 
+struct edge {
+  int v, w, p;
 } ed[M];
 int dist[N];
 int heap[N], pos[N], hn;
 
 void init(int n) {
-  en = 0; 
+  en = 0;
   memset(hd, -1, sizeof(hd[0]) * n);
 }
 
@@ -69,7 +69,7 @@ int main() {
   }
 
   heap_init(n);
-  memset(dist, 0x3f, sizeof(dist[0]) * n); 
+  memset(dist, 0x3f, sizeof(dist[0]) * n);
   dist[s] = 0;
   heap_up(pos[s]);
 

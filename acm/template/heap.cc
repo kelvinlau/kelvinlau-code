@@ -7,7 +7,7 @@ typedef int T;
 
 const int N = 10000 + 10;
 
-T value[N]; 
+T value[N];
 int n;
 int heap[N], pos[N], hn;
 

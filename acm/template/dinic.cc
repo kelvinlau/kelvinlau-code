@@ -28,7 +28,7 @@ int flow(int n, int s, int t) {
         if (k == t) { f = r; break; }
       }
     if (dep[t] == -1) break;
-    
+
     memcpy(cur, hd, n * sizeof(int));
     for (i = s, top = 0; ; ) {
       if (i == t) {

@@ -10,12 +10,12 @@ using namespace std;
 
 const double eps = 1e-8, inf = 1e+9, pi = acos(-1.0);
 
-inline int sign(double x) { 
-  return x < -eps ? -1 : x > eps; 
+inline int sign(double x) {
+  return x < -eps ? -1 : x > eps;
 }
 
-inline double sqr(double x) { 
-  return x * x; 
+inline double sqr(double x) {
+  return x * x;
 }
 
 struct point {
@@ -40,7 +40,7 @@ inline int ip_circle_circle(
     const circle &c1, const circle &c2, point &p1, point &p2) {
   double mx = c2.o.x - c1.o.x, sx = c2.o.x + c1.o.x, mx2 = sqr(mx);
   double my = c2.o.y - c1.o.y, sy = c2.o.y + c1.o.y, my2 = sqr(my);
-  double sq = mx2 + my2; 
+  double sq = mx2 + my2;
   double d = -(sq - sqr(c1.r - c2.r)) * (sq - sqr(c1.r + c2.r));
   if (!sign(sq)) return 0;
   if (d + eps < 0) return 0;

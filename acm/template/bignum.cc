@@ -106,7 +106,7 @@ bignum operator+(const bignum& A, const bignum& B) {
   if (A.s) return B - (-A);
   if (B.s) return A - (-B);
 
-  bignum C; 
+  bignum C;
   C.n = max(A.n, B.n);
   int carry = 0;
   for (int i = 0; i < C.n; i++) {
@@ -153,19 +153,19 @@ void div(bignum A, bignum B, bignum &Q, bignum &R) {
   int s = A.s ^ B.s;
   A.s = B.s = 0;
   R = A;
-  
+
   while (R >= B) {
     q = bignum::exp(max(R.n - B.n - 1, 0));
     p = q * B;
     if (p * BASE <= R) { p *= BASE; q *= BASE; }
-    
+
     int u = 1;
     int v = BASE;
     while (u + 1 < v) {
       int k = (u + v) / 2;
       if (p * k <= R) u = k; else v = k;
     }
-    
+
     Q += q * u;
     R -= p * u;
   }

@@ -1,4 +1,4 @@
-/* Restore the tree from a distance matrix of every pair of leaves 
+/* Restore the tree from a distance matrix of every pair of leaves
  * O(L ^ 3) */
 #include <stdio.h>
 #include <string.h>
