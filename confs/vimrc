@@ -1,5 +1,5 @@
-filetype on
 syntax on
+filetype plugin indent on
 set nocp nu ru bg=dark ai si et bs=2 fo+=ro is nohls
 set mouse=a aw ar wmnu nowrap nobackup noswf
 let &tenc=&enc
@@ -12,6 +12,8 @@ map <F3> :s!^!# !<CR>
 map <F4> :s!^# !!<CR>
 au FileType c,cpp,java,javascript map <buffer> <F3> :s!^!//!<CR>
 au FileType c,cpp,java,javascript map <buffer> <F4> :s!^//!!<CR>
+au FileType vim map <buffer> <F3> :s!^!" !<CR>
+au FileType vim map <buffer> <F4> :s!^" !!<CR>
 
 " clipboard
 " map <F2> ggVG"+y
