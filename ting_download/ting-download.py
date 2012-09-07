@@ -4,10 +4,9 @@
 
 import sys
 import os
-from urlparse import urlparse
-import urllib2
 import re
-
+import urllib2
+from urlparse import urlparse
 import simplejson as json
 from BeautifulSoup import BeautifulSoup
 
@@ -18,7 +17,7 @@ class DownloadError(Exception): pass
 class NotFoundError(Exception): pass
 
 class MusicInfo(object):
-  """ting music"""
+  """Ting music struct."""
 
   def __init__(self, id, song_name, artist_name):
     self.id = id
@@ -26,16 +25,15 @@ class MusicInfo(object):
     self.artist_name = artist_name
 
   def __repr__(self):
-    return u'%s %s - %s' %(self.id, self.artist_name, self.song_name)
+    return u'%s %s - %s' % (self.id, self.artist_name, self.song_name)
 
 class TingDownload(object):
-  """a download helper for ting.baidu.com"""
+  """Download helper for ting.baidu.com."""
 
-  SEARCH_URL = u'http://openapi.baidu.com/public/2.0/mp3/info/suggestion?' \
-        'format=json&word=%(word)s&callback=window.baidu.sug'
+  SEARCH_URL = (u'http://openapi.baidu.com/public/2.0/mp3/info/suggestion?'
+                 'format=json&word=%(word)s&callback=window.baidu.sug')
   DOWNLOAD_URL = u'http://ting.baidu.com/song/%s/download'
   TARGET_URL = u'http://ting.baidu.com%s'
-
   MUSICS_DIR = os.path.expanduser('~/Music')
 
   def __init__(self, name):
@@ -43,64 +41,70 @@ class TingDownload(object):
     if not os.path.exists(self.MUSICS_DIR):
       os.mkdir(self.MUSICS_DIR)
 
-  def download(self):
+  def Download(self):
+    """Main routine."""
     try:
-      self.music_info = self.search()
+      self.music_info = self.Search()
     except urllib2.URLError, e:
       raise DownloadError(e)
     except NotFoundError, e:
       raise e
 
-    self.target_url = self.fetchMusic()
-    self.write_file()
+    self.target_url = self.FetchMusic()
+    self.WriteFile()
 
-  def search(self):
+  def Search(self):
+    """Search for the exact song from keyword."""
     word = urllib2.quote(self.name.encode('utf-8'))
-    url = self.SEARCH_URL %{'word': word}
+    url = self.SEARCH_URL % {'word': word}
     handler = urllib2.urlopen(url)
     json_text  = handler.read()
     json_result = json.loads(json_text.strip()[17: -2])
     if len(json_result['song']) < 1:
-      raise NotFoundError(u"Cannot find song: %s" %self.name)
+      raise NotFoundError(u"Cannot find song: %s" % self.name)
     elif len(json_result['song']) > 1:
       i = 0
       for song in json_result['song']:
         print '%2d: %10s %10s' % (i, song['songname'], song['artistname'])
         i += 1
-      print 'input index: ',
-      i = input()
+      print 'Input index: ',
+      i = raw_input()
+      if i == '':
+        raise NotFoundError
+      i = int(i)
+      if i < 0 or i >= len(json_result['song']):
+        raise NotFoundError
     else:
       i = 0
     entry = json_result['song'][i]
     music = MusicInfo(entry['songid'], entry['songname'], entry['artistname'])
     return music
 
-  def fetchMusic(self):
-    """get the link of music"""
+  def FetchMusic(self):
+    """Get the link of music."""
     page = urllib2.urlopen(self.DOWNLOAD_URL %self.music_info.id).read()
     link = BeautifulSoup(page).findAll('a')[-1]
-    return self.TARGET_URL %link['href']
+    return self.TARGET_URL % link['href']
 
-  def write_file(self):
-    """save music to disk"""
+  def WriteFile(self):
+    """Save music to disk."""
     save_path = os.path.join(self.MUSICS_DIR,
-                 self.music_info.artist_name + '-' + \
-                 self.music_info.song_name + '.mp3')
+        self.music_info.artist_name + '-' + self.music_info.song_name + '.mp3')
 
-    file = open(save_path, 'w')
+    # TODO: add progress status
+    fd = open(save_path, 'w')
     print 'Downloading to:', save_path
     handler = urllib2.urlopen(self.target_url)
-    file.write(handler.read())
-    file.close()
+    fd.write(handler.read())
+    fd.close()
 
 def main():
-  for name in sys.argv[1:]:
+  for keyword in sys.argv[1:]:
     try:
-      tingDownload = TingDownload(re.sub(r'\s+', ' ', name.strip()))
-      tingDownload.download()
-    except NotFoundError, e:
+      TingDownload(keyword).Download()
+    except NotFoundError:
       print 'No result found'
-    except DownloadError, e:
+    except DownloadError:
       print 'Download error'
     else:
       print 'Download successful'
