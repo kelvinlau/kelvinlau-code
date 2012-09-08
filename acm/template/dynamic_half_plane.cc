@@ -22,7 +22,8 @@ struct line {
   double alpha;
   line() {}
   line(point a, point b) {
-    p = a; q = b;
+    p = a;
+    q = b;
     alpha = atan2(q.y - p.y, q.x - p.x);
   }
   bool operator<(const line &l) const {
@@ -35,9 +36,10 @@ inline double cross(point a, point b, point c) {
 }
 
 point ip(line u, line v) {
-  double n = (u.p.y - v.p.y) * (v.q.x - v.p.x) - (u.p.x - v.p.x) * (v.q.y - v.p.y);
-  double d = (u.q.x - u.p.x) * (v.q.y - v.p.y) - (u.q.y - u.p.y) * (v.q.x - v.p.x);
-  double r = n / d;
+  double n, d, r;
+  n = (u.p.y - v.p.y) * (v.q.x - v.p.x) - (u.p.x - v.p.x) * (v.q.y - v.p.y);
+  d = (u.q.x - u.p.x) * (v.q.y - v.p.y) - (u.q.y - u.p.y) * (v.q.x - v.p.x);
+  r = n / d;
   return point(u.p.x + r * (u.q.x - u.p.x), u.p.y + r * (u.q.y - u.p.y));
 }
 
@@ -52,7 +54,8 @@ void forward(polygon &s, polygon::iterator &it) {
 }
 
 void backward(polygon &s, polygon::iterator &it) {
-  if (it == s.begin()) it = s.end(); --it;
+  if (it == s.begin()) it = s.end();
+  --it;
 }
 
 int main() {
@@ -82,12 +85,12 @@ int main() {
 
       if (!p.empty()) {
         polygon::iterator b = p.lower_bound(l);
-        polygon::iterator a = b; backward(p, a);
+        polygon::iterator a = b;
+        backward(p, a);
 
         point prev = a->second;
 
         if (side(l, prev) < 0) {
-
           backward(p, b);
           backward(p, a);
 
@@ -109,12 +112,14 @@ int main() {
           }
           area -= cross(o, prev, a->second);
           if (p.size() > 1) {
-            backward(p, a); backward(p, b);
+            backward(p, a);
+            backward(p, b);
             p[l] = ip(l, b->first);
             a->second = ip(a->first, l);
             area += cross(o, p[l], b->second);
             area += cross(o, a->second, p[l]);
-            b = a; backward(p, a);
+            b = a;
+            backward(p, a);
             area += cross(o, a->second, b->second);
           } else {
             p.clear();

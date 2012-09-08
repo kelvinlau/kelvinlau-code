@@ -157,7 +157,9 @@ int main() {
       int n1 = n;
       for (int i = 1; i < n1; i++)
         output(i);
-    } else puts("-1");
+    } else {
+      puts("-1");
+    }
     puts("");
   }
   return 0;

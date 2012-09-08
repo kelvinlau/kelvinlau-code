@@ -92,8 +92,8 @@ void splay(node *x) {
   node *p;
 
   while (p = x->p) {
-    down(p); // sometimes not necessary
-    down(x); //
+    down(p);  // sometimes not necessary
+    down(x);
     if (p->l == x)
       rr(p);
     else
@@ -137,7 +137,8 @@ void reverse(node *x) {
   x->z ^= 1;
 }
 
-/* cut out a subtree containing x to the end, returns the root of the other subtree */
+/* cut out a subtree containing x to the end,
+ * returns the root of the other subtree */
 node *cut(node *x) {
   splay(x);
   node *l = x->l;

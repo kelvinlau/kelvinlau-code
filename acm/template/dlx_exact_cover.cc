@@ -138,8 +138,9 @@ int main() {
     for (int i = 0; i < N; i++, puts(""))
       for (int j = 0; j < N; j++)
         printf("%c", '1' + ans[i][j]);
-  } else
+  } else {
     puts("no solution!");
+  }
 
   return 0;
 }

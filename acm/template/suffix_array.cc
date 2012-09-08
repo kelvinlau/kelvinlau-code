@@ -15,7 +15,8 @@ void suffix_array(char *str, int *sa, int *ht, int *rk, int *h) {
   int i, j, t, k, n = strlen(str);
 
   for (i = 0; i < n; i++) sa[i] = i;
-  _str = str; sort(sa, sa + n, cmp);
+  _str = str;
+  sort(sa, sa + n, cmp);
 
   for (i = j = 0; i < n; i = j)
     while (j < n && str[sa[i]] == str[sa[j]])

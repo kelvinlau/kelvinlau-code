@@ -169,7 +169,8 @@ int main() {
     fill(first, first + n, -1);
     for (i = 0; i < n - 1; i++) {
       scanf("%d %d", &u, &v);
-      u--; v--;
+      u--;
+      v--;
       add_edge(u, v);
       add_edge(v, u);
     }
@@ -195,13 +196,15 @@ int main() {
     while (q--) {
       scanf("%s %d %d", cmd, &u, &v);
       if (cmd[1] == 'M') {
-        u--; v--;
+        u--;
+        v--;
         if (pos[u] > pos[v]) swap(u, v);
         ans = findmax(u, v, lca);
         ans = max(ans, findmax(lca, u, lca));
         printf("%d\n", ans);
       } else if (cmd[1] == 'S') {
-        u--; v--;
+        u--;
+        v--;
         if (pos[u] > pos[v]) swap(u, v);
         ans = findsum(u, v, lca);
         ans += findsum(lca, u, lca);

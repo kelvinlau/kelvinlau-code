@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <algorithm>
 #include <math.h>
+#include <algorithm>
 using namespace std;
 
 const double eps = 1e-6;
@@ -132,7 +132,8 @@ int ip_plane_seg(vector norm, point A, point p, point q, point &X) {
 /* check if 2 linesegs AB & CD touched with each other */
 int touched_segs(point A, point B, point C, point D) {
   if (zero((A - B) * (C - D)))
-    return on_seg(A, B, C) || on_seg(A, B, D) || on_seg(C, D, A) || on_seg(C, D, B);
+    return on_seg(A, B, C) || on_seg(A, B, D) ||
+           on_seg(C, D, A) || on_seg(C, D, B);
   else
     return side(C, D, A, B) <= 0 && side(A, B, C, D) <= 0;
 }
@@ -187,7 +188,8 @@ double dist_line_line(point a, point b, point c, point d) {
 
 /* this is the same as dist_line_line, but it also returns
    the points of closest approach */
-double closest_approach(point a, point b, point c, point d, point &p, point &q) {
+double closest_approach(
+    point a, point b, point c, point d, point &p, point &q) {
   double s = (d - c) ^ (b - a), t = (a - c) ^ (d - c);
   double num, den, tmp;
 
@@ -223,7 +225,8 @@ int ip_ball_line(point o, double r, point p, point q, point &a, point &b) {
  * Longitude is given in the range [-pi,pi] degrees.
  */
 double greatcircle(double lat1, double long1, double lat2, double long2) {
-  return acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(long2 - long1));
+  return acos(sin(lat1) * sin(lat2) +
+      cos(lat1) * cos(lat2) * cos(long2 - long1));
 }
 
 /* Solves the determinant of a n*n matrix recursively */
@@ -318,7 +321,8 @@ int inside_polygon(point *p, int n, vector norm, point A) {
 int intersected_polygon_seg(point *p, int n, vector norm, point A, point B) {
   if (!sign((A - B) ^ norm)) {
     if (sign(norm ^ (A - p[0]))) return 0;
-    if (inside_polygon(p, n, norm, A) || inside_polygon(p, n, norm, B)) return 1;
+    if (inside_polygon(p, n, norm, A) || inside_polygon(p, n, norm, B))
+      return 1;
     for (int i = 0; i < n; i++)
       if (touched_segs(A, B, p[i], p[i + 1])) return 1;
     return 0;
@@ -332,7 +336,8 @@ int intersected_polygon_seg(point *p, int n, vector norm, point A, point B) {
 /* normal vector of polygon p[n] */
 vector normal(point *p, int n) {
   vector b, norm;
-  p[n] = p[0]; p[n + 1] = p[1];
+  p[n] = p[0];
+  p[n + 1] = p[1];
   for (int i = 0; i < n; i++)
     if (!zero(norm = (p[i + 1] - p[i + 2]) * (p[i] - p[i + 1])))
       return norm;

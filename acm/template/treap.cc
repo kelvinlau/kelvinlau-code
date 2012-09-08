@@ -90,8 +90,9 @@ node *_insert(node *p, node *x) {
         break;
       }
       p = p->r;
-    } else
+    } else {
       break;
+    }
   }
   return root(p);
 }
@@ -214,9 +215,15 @@ node *merge(node *x, node *y) {
 void dfs(node *x) {
   putchar('(');
   if (x) {
-    if (x->l) { dfs(x->l); putchar(' '); }
+    if (x->l) {
+      dfs(x->l);
+      putchar(' ');
+    }
     printf("%d", x->d);
-    if (x->r) { putchar(' '); dfs(x->r); }
+    if (x->r) {
+      putchar(' ');
+      dfs(x->r);
+    }
   }
   putchar(')');
 }

@@ -73,7 +73,9 @@ int exp() {
       ans += term();
     } else if (match('-')) {
       ans -= term();
-    } else break;
+    } else {
+      break;
+    }
 
     ok &= fit(ans);
   }
@@ -95,7 +97,9 @@ int term() {
         ans %= t;
       else
         ok = 0;
-    } else break;
+    } else {
+      break;
+    }
     ok &= fit(ans);
   }
   return (int)ans;

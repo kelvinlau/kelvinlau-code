@@ -46,7 +46,7 @@ int max_match(int n) {
         if (vx[i]) lx[i] -= d;
       for (int j = 0; j < n; j++)
         if (vy[j])
-          ly[j] += d; 
+          ly[j] += d;
         else
           slack[j] -= d;
     }

@@ -9,10 +9,12 @@ const int limit = 1000 * N;
 
 int n, n1;
 int hd[N + N], en;
-struct edge { int v, w, p, a; } ed[N * 6];
+struct edge {
+  int v, w, p, a;
+} ed[N * 6];
 
 void add(int u, int v, int w, int a = 1) {
-  ed[en] = (edge) { v, w, hd[u], a }; // XXX g++ only!!
+  ed[en] = (edge) { v, w, hd[u], a };  // XXX g++ only!!
   hd[u] = en++;
 }
 
@@ -121,9 +123,9 @@ void heap_init(int st, node *x) {
 
 void update(node *x) {
   /* calculate f value */
-  if (!x->l)
+  if (!x->l) {
     x->f = x->val[0];
-  else {
+  } else {
     x->f = max(x->l->f, x->r->f);
     int ld = x->l->val[x->l->hid[0]];
     int rd = x->r->val[x->r->hid[0]];
@@ -143,7 +145,8 @@ node *divide(int rt) {
     int u = q[s++];
     for (int z = hd[u]; z > -1; z = ed[z].p) if (ed[z].a == 1) {
       int v = ed[z].v;
-      if (bv == -1 || abs(size[rt] - size[v] * 2) < abs(size[rt] - size[bv] * 2))
+      if (bv == -1 ||
+          abs(size[rt] - size[v] * 2) < abs(size[rt] - size[bv] * 2))
         bu = u, bz = z, bv = v;
       if (size[v] >= size[rt] / 2) q[t++] = v;
     }
@@ -171,8 +174,15 @@ node *divide(int rt) {
   node *x = a + (m++);
   x->d = ed[bz].w;
   x->hn = sz;
-  x->l = divide(rt); heap_init(bu, x->l); update(x->l);
-  x->r = divide(bv); heap_init(bv, x->r); update(x->r);
+
+  x->l = divide(rt);
+  heap_init(bu, x->l);
+  update(x->l);
+
+  x->r = divide(bv);
+  heap_init(bv, x->r);
+  update(x->r);
+
   x->l->p = x->r->p = x;
   x->le = x->l->le;
 
@@ -200,11 +210,14 @@ void change(int v) {
 
 int main() {
   /* input */
-  scanf("%d", &n); init(n + n); n1 = n;
+  scanf("%d", &n);
+  init(n + n);
+  n1 = n;
   for (int i = 0; i < n - 1; i++) {
     int u, v, w;
     scanf("%d %d %d", &u, &v, &w);
-    u--; v--;
+    u--;
+    v--;
     add(u, v, w);
     add(v, u, w);
   }
@@ -269,11 +282,15 @@ int main() {
   update(root);
 
   /* query */
-  int Q; scanf("%d", &Q);
+  int Q;
+  scanf("%d", &Q);
   while (Q--) {
-    char c; scanf(" %c", &c);
+    char c;
+    scanf(" %c", &c);
     if (c == 'C') {
-      int v; scanf("%d", &v); v--;
+      int v;
+      scanf("%d", &v);
+      v--;
       change(v);
     } else {
       int ans = root->f;

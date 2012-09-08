@@ -99,7 +99,7 @@ void sam_display() {
 int main() {
   static char str[L];
   int n;
-  
+
   sam_init();
   scanf("%d", &n);
   while (n--) {

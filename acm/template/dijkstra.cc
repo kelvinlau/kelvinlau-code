@@ -20,7 +20,7 @@ void init(int n) {
 }
 
 void add(int u, int v, int w) {
-  ed[en] = (edge) { v, w, hd[u] }; // XXX g++ only!!
+  ed[en] = (edge) { v, w, hd[u] };  // XXX g++ only!!
   hd[u] = en++;
 }
 
@@ -47,7 +47,9 @@ void heap_down(int x) {
       swap(heap[x], heap[c]);
       swap(pos[heap[x]], pos[heap[c]]);
       x = c;
-    } else break;
+    } else {
+      break;
+    }
   }
 }
 

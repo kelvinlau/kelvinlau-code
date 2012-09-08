@@ -9,13 +9,18 @@ const int MAXLEN = 110, BASE = 10000;
 struct bignum {
   int d[MAXLEN / 4], n, s;
   bignum(int x = 0) {
-    if (x < 0) s = 1, x = -x; else s = 0;
+    if (x < 0)
+      s = 1, x = -x;
+    else
+      s = 0;
     for (n = 0; x; x /= BASE)
       d[n++] = x % BASE;
   }
   bignum(const char *str) {
-    if (isdigit(*str)) s = 0;
-    else s = (*str++ == '-');
+    if (isdigit(*str))
+      s = 0;
+    else
+      s = (*str++ == '-');
 
     int k = strlen(str);
     n = (k + 3) / 4;
@@ -58,7 +63,9 @@ struct bignum {
       for (int i = n - 2; i >= 0; i--)
         printf("%04d", d[i]);
       printf("\n");
-    } else puts("0");
+    } else {
+      puts("0");
+    }
   }
 };
 
@@ -124,7 +131,8 @@ bignum operator-(const bignum& A, const bignum& B) {
   if (B.s) return A + (-B);
   if (A < B) return -(B - A);
 
-  bignum C; C.n = max(A.n, B.n);
+  bignum C;
+  C.n = max(A.n, B.n);
   int carry = 0;
   for (int i = 0; i < C.n; i++) {
     carry += (i < A.n ? A.d[i] : 0) - (i < B.n ? B.d[i] : 0);
@@ -136,7 +144,9 @@ bignum operator-(const bignum& A, const bignum& B) {
 }
 
 bignum operator*(const bignum& A, const bignum& B) {
-  bignum C; C.n = A.n + B.n; C.s = A.s ^ B.s;
+  bignum C;
+  C.n = A.n + B.n;
+  C.s = A.s ^ B.s;
   fill(C.d, C.d + C.n, 0);
   for (int i = 0; i < A.n; i++)
     for (int j = 0; j < B.n; j++) {
@@ -157,13 +167,19 @@ void div(bignum A, bignum B, bignum &Q, bignum &R) {
   while (R >= B) {
     q = bignum::exp(max(R.n - B.n - 1, 0));
     p = q * B;
-    if (p * BASE <= R) { p *= BASE; q *= BASE; }
+    if (p * BASE <= R) {
+      p *= BASE;
+      q *= BASE;
+    }
 
     int u = 1;
     int v = BASE;
     while (u + 1 < v) {
       int k = (u + v) / 2;
-      if (p * k <= R) u = k; else v = k;
+      if (p * k <= R)
+        u = k;
+      else
+        v = k;
     }
 
     Q += q * u;

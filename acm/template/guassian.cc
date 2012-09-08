@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
-#include <algorithm>
 #include <math.h>
+#include <algorithm>
 using namespace std;
 
 const int N = 100 + 10;

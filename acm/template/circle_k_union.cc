@@ -4,8 +4,8 @@
  * O(n ^ 2 log(n)) */
 #include <stdio.h>
 #include <string.h>
-#include <algorithm>
 #include <math.h>
+#include <algorithm>
 using namespace std;
 
 const double eps = 1e-8, inf = 1e+9, pi = acos(-1.0);
@@ -44,12 +44,18 @@ inline int ip_circle_circle(
   double d = -(sq - sqr(c1.r - c2.r)) * (sq - sqr(c1.r + c2.r));
   if (!sign(sq)) return 0;
   if (d + eps < 0) return 0;
-  if (d < eps) d = 0; else d = sqrt(d);
+  if (d < eps)
+    d = 0;
+  else
+    d = sqrt(d);
   double x = mx * ((c1.r + c2.r) * (c1.r - c2.r) + mx * sx) + sx * my2;
   double y = my * ((c1.r + c2.r) * (c1.r - c2.r) + my * sy) + sy * mx2;
-  double dx = mx * d, dy = my * d; sq *= 2;
-  p1.x = (x + dy) / sq; p1.y = (y - dx) / sq;
-  p2.x = (x - dy) / sq; p2.y = (y + dx) / sq;
+  double dx = mx * d, dy = my * d;
+  sq *= 2;
+  p1.x = (x + dy) / sq;
+  p1.y = (y - dx) / sq;
+  p2.x = (x - dy) / sq;
+  p2.y = (y + dx) / sq;
   return d > eps ? 2 : 1;
 }
 

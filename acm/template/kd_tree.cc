@@ -54,7 +54,7 @@ node *build(point **xl, point **yl, int n, int d) {
   if (n == 1) {
     u->l = u->r = NULL;
     u->p = xl[0];
-    u->s = 0; // XXX size set to 0 here
+    u->s = 0;  // XXX size set to 0 here
     return u;
   }
 

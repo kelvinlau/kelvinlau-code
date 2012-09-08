@@ -7,17 +7,19 @@ const int N = 100010;
 typedef long long ll;
 
 int en, hd[N];
-struct edge { int v, w, p; } ed[N + N];
+struct edge {
+  int v, w, p;
+} ed[N + N];
 int dist[N], h[N], pnt[N][15], dmax, q[N], s, t;
 
 void add(int u, int v, int w) {
-  ed[en] = (edge) { v, w, hd[u] }; // XXX g++ only!!
+  ed[en] = (edge) { v, w, hd[u] };  // XXX g++ only!!
   hd[u] = en++;
 }
 
 void init(int n) {
   en = 0;
-  memset(hd, -1, sizeof(int) * n);
+  memset(hd, -1, sizeof(hd[0]) * n);
 }
 
 int jump(int v, int d) {

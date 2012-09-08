@@ -69,7 +69,7 @@ struct range_tree {
 };
 
 const int N = 100010;
-const int M = N * 20; // N log N
+const int M = N * 20;  // N log N
 const int INF = 2010000000;
 
 node nodes[N << 1], *next;
@@ -86,7 +86,8 @@ node *__build(point **xl, point **yl, point **yt, int n) {
   p->x1 = xl[0]->x;
   p->x2 = xl[n - 1]->x;
   p->size = n;
-  p->ta = tn; tn += n + 1;
+  p->ta = tn;
+  tn += n + 1;
   ta_init(p->ta, n + 1);
 
   if (n > 1) {
@@ -95,8 +96,10 @@ node *__build(point **xl, point **yl, point **yt, int n) {
     yb = yt + d;
     na = d;
     nb = n - d;
-    p->la = ln; ln += n + 1;
-    p->lb = ln; ln += n + 1;
+    p->la = ln;
+    ln += n + 1;
+    p->lb = ln;
+    ln += n + 1;
     p->la[n] = na;
     p->lb[n] = nb;
     for (i = n - 1; i >= 0; i--) {
@@ -158,8 +161,8 @@ int range_tree_query(range_tree *rt, int x1, int x2, int y1, int y2) {
 
   if (!root) return 0;
 
-  a.x = -INF; a.y = y1;
-  b.x = +INF; b.y = y2;
+  a.x = -INF, a.y = y1;
+  b.x = +INF, b.y = y2;
   lb = lower_bound(rt->yl, rt->yl + rt->size, &a, ycmp) - rt->yl;
   ub = upper_bound(rt->yl, rt->yl + rt->size, &b, ycmp) - rt->yl;
   return __query(root, x1, x2, lb, ub);
@@ -172,7 +175,7 @@ int range_tree_add(range_tree *rt, int x, int y, int d) {
 
   if (!p) return 0;
 
-  a.x = x; a.y = y;
+  a.x = x, a.y = y;
   i = lower_bound(rt->yl, rt->yl + rt->size, &a, ycmp) - rt->yl;
   if (i == rt->size || rt->yl[i]->x != x || rt->yl[i]->y != y)
     return 0;

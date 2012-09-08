@@ -24,8 +24,10 @@ int kth(int k) {
   int ret = 0;
   for (int i = B; i >= 0; i--) {
     ret += 1 << i;
-    if (ret > n || c[ret] > k) ret -= 1 << i;
-    else k -= c[ret];
+    if (ret > n || c[ret] > k)
+      ret -= 1 << i;
+    else
+      k -= c[ret];
   }
   return ret;
 }

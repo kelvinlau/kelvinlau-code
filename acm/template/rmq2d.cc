@@ -43,9 +43,11 @@ int main() {
           if (x == 0 && y == 0)
             rmq[i][j][x][y] = a[i][j];
           else if (y == 0)
-            rmq[i][j][x][y] = max(rmq[i][j][x - 1][y], rmq[i + (1 << (x - 1))][j][x - 1][y]);
+            rmq[i][j][x][y] = max(rmq[i][j][x - 1][y],
+                                  rmq[i + (1 << (x - 1))][j][x - 1][y]);
           else
-            rmq[i][j][x][y] = max(rmq[i][j][x][y - 1], rmq[i][j + (1 << (y - 1))][x][y - 1]);
+            rmq[i][j][x][y] = max(rmq[i][j][x][y - 1],
+                                  rmq[i][j + (1 << (y - 1))][x][y - 1]);
 
   return 0;
 }

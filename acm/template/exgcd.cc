@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
-#include <algorithm>
 #include <math.h>
+#include <algorithm>
 using namespace std;
 
 typedef long long ll;
@@ -75,7 +75,7 @@ ll modular_log(ll a, ll b, ll m) {
     table[j] = pp(p, j);
   stable_sort(table, table + s);
 
-  ll c = invert(modular_pow(a, s, m), m); // c = a ^ (-m)
+  ll c = invert(modular_pow(a, s, m), m);  // c = a ^ (-m)
 
   for (ll i = 0; i < m; i++, b = b * c % m) {
     pp *p = lower_bound(table, table + s, pp(b, -1));

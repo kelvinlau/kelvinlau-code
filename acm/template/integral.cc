@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <string.h>
-#include <algorithm>
 #include <math.h>
+#include <algorithm>
 using namespace std;
 
 /* simpson integral of f at [a, b] */
 double simpson(double (*f)(double), double a, double b) {
-  int n = (int)(10000 * (b - a)); n -= n % 2;
+  int n = (int)(10000 * (b - a));
+  n -= n % 2;
   double A = 0, B = 0, d = (b - a) / n;
   for (int i = 1; i < n; i += 2)
     A += f(a + i * d);
@@ -39,8 +40,8 @@ double romberg(double (*f)(double), double l, double r) {
 }
 
 /* helper function of adaptive_simpsons */
-double adaptive_simpsons_aux(double (*f)(double), double a, double b, double eps,
-                         double s, double fa, double fb, double fc, int depth) {
+double adaptive_simpsons_aux(double (*f)(double), double a, double b,
+    double eps, double s, double fa, double fb, double fc, int depth) {
   double c = (a + b) / 2, h = b - a;
   double d = (a + c) / 2, e = (c + b) / 2;
   double fd = f(d), fe = f(e);
@@ -53,8 +54,10 @@ double adaptive_simpsons_aux(double (*f)(double), double a, double b, double eps
          adaptive_simpsons_aux(f, c, b, eps / 2, sr, fc, fb, fe, depth - 1);
 }
 
-/* Adaptive Simpson's Rule, integral of f at [a, b], max error of eps, max depth of depth */
-double adaptive_simpsons(double (*f)(double), double a, double b, double eps, int depth) {
+/* Adaptive Simpson's Rule, integral of f at [a, b],
+ * max error of eps, max depth of depth */
+double adaptive_simpsons(double (*f)(double), double a, double b,
+    double eps, int depth) {
   double c = (a + b) / 2, h = b - a;
   double fa = f(a), fb = f(b), fc = f(c);
   double s = (fa + 4 * fc + fb) * h / 6;

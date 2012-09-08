@@ -7,7 +7,8 @@ using namespace std;
 typedef unsigned char byte;
 const byte mask[] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
 #define tget(i) ( (t[(i) >> 3] & mask[(i) & 7]) ? 1 : 0 )
-#define tset(i, b) t[(i) >> 3] = (b) ? (mask[(i) & 7]|t[(i) >> 3]) : ((~mask[(i) & 7]) & t[(i) >> 3])
+#define tset(i, b) t[(i) >> 3] = \
+    (b) ? (mask[(i) & 7]|t[(i) >> 3]) : ((~mask[(i) & 7]) & t[(i) >> 3])
 #define chr(i) (cs == sizeof(int) ? ((int*)s)[i] : ((byte *)s)[i])
 #define isLMS(i) (i > 0 && tget(i) && !tget(i - 1))
 
@@ -23,7 +24,8 @@ void getBuckets(byte *s, int *bkt, int n, int K, int cs, bool end) {
   }
 }
 
-void induceSAl(byte *t, int *SA, byte *s, int *bkt, int n, int K, int cs, bool end) {
+void induceSAl(byte *t, int *SA, byte *s, int *bkt,
+    int n, int K, int cs, bool end) {
   int i, j;
   getBuckets(s, bkt, n, K, cs, end);
   for (i = 0; i < n; i++) {
@@ -33,7 +35,8 @@ void induceSAl(byte *t, int *SA, byte *s, int *bkt, int n, int K, int cs, bool e
   }
 }
 
-void induceSAs(byte *t, int *SA, byte *s, int *bkt, int n, int K, int cs, bool end) {
+void induceSAs(byte *t, int *SA, byte *s, int *bkt,
+    int n, int K, int cs, bool end) {
   int i, j;
   getBuckets(s, bkt, n, K, cs, end);
   for (i = n - 1; i >= 0; i--) {
@@ -50,7 +53,8 @@ void issa(byte *s, int *SA, int n, int K, int cs) {
   tset(n - 2, 0);
   tset(n - 1, 1);
   for (i = n - 3; i >= 0; i--)
-    tset(i, (chr(i) < chr(i + 1) || (chr(i) == chr(i + 1) && tget(i + 1) == 1)) ? 1 : 0);
+    tset(i, (chr(i) < chr(i + 1) ||
+             (chr(i) == chr(i + 1) && tget(i + 1) == 1)) ? 1 : 0);
 
   int *bkt = (int *) malloc(sizeof(int) * (K + 1));
   getBuckets(s, bkt, n, K, cs, true);
@@ -75,11 +79,13 @@ void issa(byte *s, int *SA, int n, int K, int cs) {
     int pos = SA[i];
     bool diff = false;
     for (int d = 0; d < n; d++)
-      if (prev == -1 || chr(pos + d) != chr(prev + d) || tget(pos + d) != tget(prev + d)) {
+      if (prev == -1 || chr(pos + d) != chr(prev + d) ||
+          tget(pos + d) != tget(prev + d)) {
         diff = true;
         break;
-      } else if (d > 0 && (isLMS(pos + d) || isLMS(prev + d)))
+      } else if (d > 0 && (isLMS(pos + d) || isLMS(prev + d))) {
         break;
+      }
       if (diff) {
         name++;
         prev = pos;

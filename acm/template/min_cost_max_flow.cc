@@ -7,7 +7,9 @@ const int N = 1010;
 const int M = 100010;
 const int INF = 0x3f3f3f3f;
 
-struct edge { int u, v, f, c, p; } ed[M];
+struct edge {
+  int u, v, f, c, p;
+} ed[M];
 int en, hd[N];
 
 void init() {
@@ -16,8 +18,10 @@ void init() {
 }
 
 void add_edge(int u, int v, int f, int c) {
-  ed[en] = (edge) { u, v, f, +c, hd[u] }; hd[u] = en++; // XXX g++ only!!
-  ed[en] = (edge) { v, u, 0, -c, hd[v] }; hd[v] = en++; // XXX g++ only!!
+  ed[en] = (edge) { u, v, f, +c, hd[u] };  // XXX g++ only!!
+  hd[u] = en++;
+  ed[en] = (edge) { v, u, 0, -c, hd[v] };  // XXX g++ only!!
+  hd[v] = en++;
 }
 
 int min_cost_max_flow(int s, int t) {

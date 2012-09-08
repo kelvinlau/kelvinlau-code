@@ -36,7 +36,9 @@ void heap_down(int x) {
       swap(heap[x], heap[c]);
       swap(pos[heap[x]], pos[heap[c]]);
       x = c;
-    } else break;
+    } else {
+      break;
+    }
   }
 }
 

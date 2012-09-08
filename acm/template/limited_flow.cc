@@ -61,7 +61,8 @@ int limited_min_flow(int s, int t, int n) {
     res += net[s][i] + low[s][i];  // be aware of overflow
 
   a = net[s][t];
-  b = net[t][s]; net[t][s] = inf;
+  b = net[t][s];
+  net[t][s] = inf;
   max_flow(x, y, n + 2);
 
   for (i = 0; i < n; i++)

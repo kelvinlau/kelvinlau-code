@@ -218,9 +218,9 @@ void solve(int r, int n, VI &res) {
     p = 1;
     for (j = 0; j < fac[i].second; j++)
       p *= fac[i].first;
-    if (fac[i].first == 2)
+    if (fac[i].first == 2) {
       getPowerSol2(r, fac[0].second, tmp);
-    else {
+    } else {
       if (pm(r, (fac[i].first - 1) >> 1, fac[i].first) != 1)
         return;
       getPowerSol(r, fac[i].first, fac[i].second, r1, r2);

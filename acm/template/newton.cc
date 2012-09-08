@@ -51,7 +51,8 @@ int main() {
       fs[i][j] = modular(fs[i + 1][j] - fs[i][j - 1], R) * invert(d, R) % R;
 
   while (q--) {
-    ll x; scanf("%lld", &x);
+    ll x;
+    scanf("%lld", &x);
     printf("%lld\n", f(x));
   }
 

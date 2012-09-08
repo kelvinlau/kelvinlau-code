@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <algorithm>
 #include <math.h>
+#include <algorithm>
 #include <list>
 using namespace std;
 
@@ -74,7 +74,8 @@ inline double delta_angle(point a, point b, point c) {
 
 /* if ABC a sharp triangle */
 int sharp(point a, point b, point c) {
-  return sign(dot(a, b, c)) > 0 && sign(dot(b, a, c)) > 0 && sign(dot(c, a, b)) > 0;
+  return sign(dot(a, b, c)) > 0 && sign(dot(b, a, c)) > 0 &&
+    sign(dot(c, a, b)) > 0;
 }
 
 double fix(double a, double b = 0) {
@@ -108,7 +109,7 @@ double area_heron(double a, double b, double c) {
 }
 
 double area_triangle(point a, point b, point c) {
-  return fabs(a.x * b.y + b.x * c.y + c.x * a.y - a.x * c.y - b.x * a.y - c.x * b.y) / 2;
+  return fabs(cross(a, b, c)) / 2.0;
 }
 
 double area_polygon(point a[], int n) {
@@ -150,10 +151,11 @@ int find_convex(point p[], int n) {
   sort(p, p + n, acmp);
 
   int top = 0;
-  point *stack = (point *)malloc(sizeof(point) * n); // XXX malloc!
+  point *stack = (point *)malloc(sizeof(point) * n);  // XXX malloc!
 
   for (int i = 0; i < n; i++) {
-    while (top >= 2 && sign(cross(stack[top - 2], stack[top - 1], p[i])) <= 0) top--;
+    while (top >= 2 && sign(cross(stack[top - 2], stack[top - 1], p[i])) <= 0)
+      top--;
     stack[top++] = p[i];
   }
   copy(stack, stack + top, p);
@@ -216,7 +218,8 @@ struct line {
 };
 
 int parallel(line u, line v) {
-  return !sign((u.p.x - u.q.x) * (v.p.y - v.q.y) - (v.p.x - v.q.x) * (u.p.y - u.q.y));
+  return !sign((u.p.x - u.q.x) * (v.p.y - v.q.y) -
+      (v.p.x - v.q.x) * (u.p.y - u.q.y));
 }
 
 /* same side: 1; at least one of a, b touches l: 0; otherwise -1 */
@@ -245,9 +248,10 @@ int intersected_exclusive(line u, line v) {
 
 /* intersection point */
 point ip(line u, line v) {
-  double n = (u.p.y - v.p.y) * (v.q.x - v.p.x) - (u.p.x - v.p.x) * (v.q.y - v.p.y);
-  double d = (u.q.x - u.p.x) * (v.q.y - v.p.y) - (u.q.y - u.p.y) * (v.q.x - v.p.x);
-  double r = n / d;
+  double n, d, r;
+  n = (u.p.y - v.p.y) * (v.q.x - v.p.x) - (u.p.x - v.p.x) * (v.q.y - v.p.y);
+  d = (u.q.x - u.p.x) * (v.q.y - v.p.y) - (u.q.y - u.p.y) * (v.q.x - v.p.x);
+  r = n / d;
   return point(u.p.x + r * (u.q.x - u.p.x), u.p.y + r * (u.q.y - u.p.y));
 }
 
@@ -276,7 +280,8 @@ double dist_lineseg_point(line l, point a) {
 int intersected_lineseg_ray(line u, line v, point &p) {
   if (parallel(u, v)) return 0;
   p = ip(u, v);
-  return on_lineseg(u, p) && (on_lineseg(v, p) || on_lineseg(line(v.p, p), v.q));
+  return on_lineseg(u, p) &&
+    (on_lineseg(v, p) || on_lineseg(line(v.p, p), v.q));
 }
 
 /* if point a inside polygon p[n] */
@@ -306,7 +311,8 @@ int lineseg_inside_polygon(point p[], int n, line l) {
 int intersect_convex_lineseg(point p[], int n, line l) {
   if (n < 3) return 0;
 
-  point q[4]; int k = 0;
+  point q[4];
+  int k = 0;
   q[k++] = l.p;
   q[k++] = l.q;
   for (int i = 0; i < n; i++) {
@@ -380,8 +386,10 @@ line translate(line l, double e, int s) {
   double y = l.q.x - l.p.x;
   x *= s * e / d;
   y *= s * e / d;
-  l.p.x += x; l.p.y += y;
-  l.q.x += x; l.q.y += y;
+  l.p.x += x;
+  l.p.y += y;
+  l.q.x += x;
+  l.q.y += y;
   return l;
 }
 
@@ -404,7 +412,7 @@ double cut_area(point *p, int n, line l) {
       }
     }
   }
-  point *q = (point *)malloc(sizeof(point) * (n + 2)); // XXX malloc!
+  point *q = (point *)malloc(sizeof(point) * (n + 2));  // XXX malloc!
   int m = 0;
   for (int i = 0; i < n; i++) {
     if (sign(cross(l.p, l.q, p[i])) >= 0)
@@ -426,11 +434,13 @@ struct triangle {
 };
 
 int inside_triangle_exclusive(point a, point b, point c, point p) {
-  return sign(cross(a, b, p)) > 0 && sign(cross(b, c, p)) > 0 && sign(cross(c, a, p)) > 0;
+  return sign(cross(a, b, p)) > 0 &&
+    sign(cross(b, c, p)) > 0 && sign(cross(c, a, p)) > 0;
 }
 
 int inside_triangle_inclusive(point a, point b, point c, point p) {
-  return sign(cross(a, b, p)) >= 0 && sign(cross(b, c, p)) >= 0 && sign(cross(c, a, p)) >= 0;
+  return sign(cross(a, b, p)) >= 0 &&
+    sign(cross(b, c, p)) >= 0 && sign(cross(c, a, p)) >= 0;
 }
 
 /* stores n - 2 splited triangles into T */
@@ -445,7 +455,11 @@ void triangulate(point p[], int n, triangle T[]) {
   for (a = b = P.begin(), c = ++b, ++c; c != P.end(); a = b, c = ++b, ++c)
     if (sign(cross(*a, *b, *c)) > 0) {
       for (q = P.begin(); q != P.end(); q++) {
-        if (q == a) { ++q; ++q; continue; }
+        if (q == a) {
+          ++q;
+          ++q;
+          continue;
+        }
         if (inside_triangle_inclusive(*a, *b, *c, *q)) break;
       }
       if (q == P.end()) {
@@ -474,7 +488,8 @@ double triangles_intersection(triangle a, triangle b) {
 
   for (int t = 0; t < 2; t++)
     for (int i = 0; i < 3; i++)
-      if (inside_triangle_exclusive(T[t].p[0], T[t].p[1], T[t].p[2], T[!t].p[i]))
+      if (inside_triangle_exclusive(
+            T[t].p[0], T[t].p[1], T[t].p[2], T[!t].p[i]))
         p[n++] = T[!t].p[i];
 
   for (int i = 0; i < 3; i++)
@@ -499,8 +514,8 @@ double triangles_intersection(triangle a, triangle b) {
 }
 
 double polygon_intersection(point p[], int n, point q[], int m) {
-  triangle *t1 = (triangle *)malloc(sizeof(triangle) * n); // XXX malloc!
-  triangle *t2 = (triangle *)malloc(sizeof(triangle) * n); // XXX malloc!
+  triangle *t1 = (triangle *)malloc(sizeof(triangle) * n);  // XXX malloc!
+  triangle *t2 = (triangle *)malloc(sizeof(triangle) * n);  // XXX malloc!
 
   triangulate(p, n, t1);
   triangulate(q, m, t2);
@@ -519,14 +534,14 @@ double polygon_intersection(point p[], int n, point q[], int m) {
 /* ---------- intersection points convex hull ---------- */
 
 bool lcmp(line u, line v) {
-  int c = sign((u.p.x - u.q.x) * (v.p.y - v.q.y) - (v.p.x - v.q.x) * (u.p.y - u.q.y));
+  int c = sign((u.p.x - u.q.x) * (v.p.y - v.q.y) -
+      (v.p.x - v.q.x) * (u.p.y - u.q.y));
   return c < 0 || !c && sign(cross(u.p, u.q, v.p)) < 0;
 }
 
 /* XXX sizeof(p) MUST be as large as n * 2
  * return # of points of resulting convex hull */
 int ip_convex(line l[], int n, point p[]) {
-
   for (int i = 0; i < n; i++)
     if (l[i].q < l[i].p) swap(l[i].p, l[i].q);
 
@@ -576,13 +591,18 @@ int ip_circle_line(circle c, line l, point &p1, point &p2) {
   double sdr = sqr(dx) + sqr(dy), dr = sqrt(sdr);
   double d, disc, x, y;
 
-  a.x -= c.o.x; a.y -= c.o.y;
-  b.x -= c.o.x; b.y -= c.o.y;
+  a.x -= c.o.x;
+  a.y -= c.o.y;
+  b.x -= c.o.x;
+  b.y -= c.o.y;
   d = a.x * b.y - b.x * a.y;
   disc = sqr(c.r) * sdr - sqr(d);
 
   if (disc < -eps) return 0;
-  if (disc < +eps) disc = 0; else disc = sqrt(disc);
+  if (disc < +eps)
+    disc = 0;
+  else
+    disc = sqrt(disc);
   x = disc * dx * (dy > 0 ? 1 : -1);
   y = disc * fabs(dy);
   p1.x = (+d * dy + x) / sdr + c.o.x;
@@ -598,12 +618,18 @@ int ip_circle_circle(const circle &c1, const circle &c2, point &p1, point &p2) {
   double sq = mx2 + my2, d = -(sq - sqr(c1.r - c2.r)) * (sq - sqr(c1.r + c2.r));
   if (!sign(sq)) return 0;
   if (d + eps < 0) return 0;
-  if (d < eps) d = 0; else d = sqrt(d);
+  if (d < eps)
+    d = 0;
+  else
+    d = sqrt(d);
   double x = mx * ((c1.r + c2.r) * (c1.r - c2.r) + mx * sx) + sx * my2;
   double y = my * ((c1.r + c2.r) * (c1.r - c2.r) + my * sy) + sy * mx2;
-  double dx = mx * d, dy = my * d; sq *= 2;
-  p1.x = (x + dy) / sq; p1.y = (y - dx) / sq;
-  p2.x = (x - dy) / sq; p2.y = (y + dx) / sq;
+  double dx = mx * d, dy = my * d;
+  sq *= 2;
+  p1.x = (x + dy) / sq;
+  p1.y = (y - dx) / sq;
+  p2.x = (x - dy) / sq;
+  p2.y = (y + dx) / sq;
   return d > eps ? 2 : 1;
 }
 

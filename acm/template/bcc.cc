@@ -6,7 +6,9 @@ using namespace std;
 const int N = 5010, M = 20010;
 
 int n, m, en, hd[N], root;
-struct edge { int v, p, b; } ed[M];
+struct edge {
+  int v, p, b;
+} ed[M];
 int vt[N], low[N], dep[N], cut[N];
 
 void init() {
@@ -15,7 +17,7 @@ void init() {
 }
 
 void add(int u, int v) {
-  ed[en] = (edge) { v, hd[u], 0 }; // XXX g++ only!!
+  ed[en] = (edge) { v, hd[u], 0 };  // XXX g++ only!!
   hd[u] = en++;
 }
 
@@ -36,7 +38,9 @@ void dfs(int u, int p, int d) {
     } else if (v != p || e) {
       low[u] = min(low[u], dep[v]);
 
-    } else e = 1;
+    } else {
+      e = 1;
+    }
   }
 }
 

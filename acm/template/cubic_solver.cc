@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <string.h>
-#include <algorithm>
 #include <math.h>
+#include <algorithm>
 using namespace std;
 
 const double PI = acos(-1.0);
 
 typedef struct {
   int n;       // Number of solutions
-  double x[3]; // Solutions
+  double x[3];  // Solutions
 } Result;
 
 // a * x ^ 3 + b * x ^ 2 + c * x + d = 0
