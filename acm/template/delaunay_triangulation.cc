@@ -1,7 +1,7 @@
-#include <cstdio>
-#include <cstring>
+#include <stdio.h>
+#include <string.h>
 #include <algorithm>
-#include <cmath>
+#include <math.h>
 
 using namespace std;
 

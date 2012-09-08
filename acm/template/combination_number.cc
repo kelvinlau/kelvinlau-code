@@ -1,5 +1,5 @@
-#include <cstdio>
-#include <cmath>
+#include <stdio.h>
+#include <math.h>
 #include <memory.h>
 
 typedef long long T;
