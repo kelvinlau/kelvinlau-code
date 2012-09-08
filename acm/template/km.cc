@@ -1,5 +1,5 @@
-#include <cstdio>
-#include <cstring>
+#include <stdio.h>
+#include <string.h>
 #include <algorithm>
 using namespace std;
 
@@ -17,7 +17,9 @@ bool find(int n, int u) {
         match[v] = u;
         return 1;
       }
-    } else slack[v] = min(slack[v], lx[u] + ly[v] - w[u][v]);
+    } else {
+      slack[v] = min(slack[v], lx[u] + ly[v] - w[u][v]);
+    }
   }
   return 0;
 }
@@ -43,7 +45,10 @@ int max_match(int n) {
       for (int i = 0; i < n; i++)
         if (vx[i]) lx[i] -= d;
       for (int j = 0; j < n; j++)
-        if (vy[j]) ly[j] += d; else slack[j] -= d;
+        if (vy[j])
+          ly[j] += d; 
+        else
+          slack[j] -= d;
     }
   }
 
@@ -72,4 +77,3 @@ int main() {
 
   return 0;
 }
-

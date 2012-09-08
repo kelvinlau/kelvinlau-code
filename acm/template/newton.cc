@@ -39,7 +39,6 @@ ll f(ll x) {
 }
 
 int main() {
-
   scanf("%d %d", &n, &q);
   for (int i = 0; i < n; i++)
     scanf("%lld %lld", &xs[i], &ys[i]);

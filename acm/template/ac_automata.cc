@@ -43,7 +43,8 @@ void build() {
   static int s, t;
 
   root->fail = NULL;
-  s = t = 0; q[t++] = root;
+  s = t = 0;
+  q[t++] = root;
   while (s < t) {
     node *u = q[s++];
     for (int z = 0; z < K; z++) {

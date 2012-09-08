@@ -23,7 +23,7 @@ void add2(int u, int v, int w) {
 
 void init(int n) {
   en = 0;
-  memset(hd, -1, sizeof(int) * n);
+  memset(hd, -1, sizeof(hd[0]) * n);
 }
 
 int q[N + N], s, t;
@@ -199,7 +199,6 @@ void change(int v) {
 }
 
 int main() {
-
   /* input */
   scanf("%d", &n); init(n + n); n1 = n;
   for (int i = 0; i < n - 1; i++) {
@@ -221,7 +220,9 @@ int main() {
       if (!size[v]) {
         size[v] = 1;
         q[t++] = v;
-      } else ed[z].a = 0;
+      } else {
+        ed[z].a = 0;
+      }
     }
   }
 

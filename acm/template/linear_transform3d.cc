@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <algorithm>
 #include <math.h>
+#include <algorithm>
 using namespace std;
 
 const int M = 4;
@@ -173,10 +173,8 @@ int main() {
   matrix A;
 
   while (scanf("%d", &n), n) {
-
     init(A, M, 1);
     while (scanf("%s", cmd) == 1) {
-
       if (!strcmp(cmd, "translate")) {
         scanf("%lf %lf %lf", &x, &y, &z);
         matrix B = {

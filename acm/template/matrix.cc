@@ -55,13 +55,13 @@ void pow_sig(int m, matrix D, matrix A, int k) {
   static matrix B, C, T;
   for (init(m, B, 1), init(m, C, 1), init(m, D, 0); k; k >>= 1) {
     if (k & 1) {
-      mul(m, T, B, C); // D = D + C * B
+      mul(m, T, B, C);  // D = D + C * B
       add(m, D, T, D);
-      mul(m, B, A, B); // B = A * B
+      mul(m, B, A, B);  // B = A * B
     }
-    mul(m, T, A, C); // C = C + C * A
+    mul(m, T, A, C);  // C = C + C * A
     add(m, C, T, C);
-    mul(m, A, A, A); // A = A * A
+    mul(m, A, A, A);  // A = A * A
   }
 }
 

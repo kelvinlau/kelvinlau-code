@@ -119,7 +119,8 @@ void find_divisors(ll n, vector<ll> &divisors) {
   factorize(n, factors);
   sort(factors.begin(), factors.end());
 
-  divisors.clear(); divisors.push_back(1);
+  divisors.clear();
+  divisors.push_back(1);
   for (int i = 0, j = 0; i < factors.size(); i = j) {
     while (j < factors.size() && factors[i] == factors[j]) j++;
 

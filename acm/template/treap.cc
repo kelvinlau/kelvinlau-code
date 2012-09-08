@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <algorithm>
 #include <ctype.h>
+#include <algorithm>
 using namespace std;
 
 typedef int T;
@@ -90,7 +90,8 @@ node *_insert(node *p, node *x) {
         break;
       }
       p = p->r;
-    } else break;
+    } else
+      break;
   }
   return root(p);
 }

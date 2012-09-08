@@ -49,7 +49,8 @@ void factorize(int n, int p[], int k[], int &m) {
 }
 
 void find_divisors(int p[], int k[], int m, int d[], int &dn) {
-  dn = 0; d[dn++] = 1;
+  dn = 0;
+  d[dn++] = 1;
   for (int i = 0; i < m; i++) {
     for (int j = 0, z = dn; j < k[i] * z; j++, dn++)
       d[dn] = d[dn - z] * p[i];
