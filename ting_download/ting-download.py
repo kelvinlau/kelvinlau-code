@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# A script to download music from ting.baidu.com
+# A script to download music from music.baidu.com
 
 import sys
 import os
@@ -28,12 +28,12 @@ class MusicInfo(object):
     return u'%s %s - %s' % (self.id, self.artist_name, self.song_name)
 
 class TingDownload(object):
-  """Download helper for ting.baidu.com."""
+  """Download helper for music.baidu.com."""
 
   SEARCH_URL = (u'http://openapi.baidu.com/public/2.0/mp3/info/suggestion?'
                  'format=json&word=%(word)s&callback=window.baidu.sug')
-  DOWNLOAD_URL = u'http://ting.baidu.com/song/%s/download'
-  TARGET_URL = u'http://ting.baidu.com%s'
+  DOWNLOAD_URL = u'http://music.baidu.com/song/%s/download'
+  TARGET_URL = u'http://music.baidu.com%s'
   MUSICS_DIR = os.path.expanduser('~/Music')
 
   def __init__(self, name):
