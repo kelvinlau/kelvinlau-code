@@ -55,7 +55,7 @@ class PegSolitaire {
   static bool Unmove(const State &s, int x, int y, int d, State *t);
   static int Heuristic(const State &s);
 
-  void ReversedBfs();
+  void ReversedBFS();
   bool Dfs(const State &s);
 
   int limit_;

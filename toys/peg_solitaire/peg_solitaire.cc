@@ -100,13 +100,11 @@ int PegSolitaire::Heuristic(const State &s) {
         }
         if (!neighbours)
           h += 7;
-        if (x % 2 == 0 && y % 2 == 0)
-          h += 4;
       }
   return h;
 }
 
-void PegSolitaire::ReversedBfs() {
+void PegSolitaire::ReversedBFS() {
   std::queue<State> queue;
   State end, u, v;
 
@@ -141,8 +139,8 @@ void PegSolitaire::Search(int limit) {
   limit_ = limit;
 
   set2_.clear();
-  ReversedBfs();
-  puts("Done ReversedBfs");
+  ReversedBFS();
+  puts("Done ReversedBFS");
 
   State start;
   start.InitStart();
@@ -204,7 +202,7 @@ void PegSolitaire::State::InitStart() {
   a = 4;
   b = c = 8;
   d = 12;
-  pcs = 32;
+  pcs = a + b + c + d;
 }
 
 void PegSolitaire::State::InitEnd() {
@@ -213,27 +211,16 @@ void PegSolitaire::State::InitEnd() {
       s[x][y] = OnCenter(x, y);
   a = 1;
   b = c = d = 0;
-  pcs = 1;
+  pcs = a + b + c + d;
 }
 
 bool PegSolitaire::State::IsEnd() const {
-  if (a != 1) return false;
-  if (b != 0) return false;
-  if (c != 0) return false;
-  if (d != 0) return false;
-  return s[kCenter][kCenter];
+  return pcs == 1 && s[kCenter][kCenter];
 }
 
 bool PegSolitaire::State::CanEnd() const {
-  int d1 = 0, d2 = 0;
-  for (int x = 0; x < kN; x += 2)
-    for (int y = 0; y < kN; y += 2)
-      if (OnBoard(x, y) && s[x][y]) {
-        if (NearEdge(x, y) == 2)
-          d1++;
-        else if (NearEdge(x, y) == 1)
-          d2++;
-      }
+  int d1 = s[0][2] + s[0][4] + s[6][0] + s[6][2];
+  int d2 = s[2][0] + s[4][0] + s[0][6] + s[2][6];
   return a > 0 && d1 <= c && d2 <= b;
 }
 
