@@ -16,7 +16,7 @@ class PegSolitaire {
   static const int kDir8 = 8;
   static const int kDx8[];
   static const int kDy8[];
-  static const int kCL = 6;
+  static const int kCL = 4;
 
   struct State {
     void InitStart();
@@ -40,7 +40,6 @@ class PegSolitaire {
     bool operator()(const State &s, const State &t) const;
   };
 
-  void Bfs();
   void Search(int limit);
 
  private:

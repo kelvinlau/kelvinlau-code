@@ -106,69 +106,6 @@ int PegSolitaire::Heuristic(const State &s) {
   return h;
 }
 
-void PegSolitaire::Bfs() {
-  StateSet set1, set2;
-  std::queue<State> queue1, queue2;
-  State start, end, u, v;
-
-  start.InitStart();
-  queue1.push(start);
-  set1.insert(start);
-
-  end.InitEnd();
-  queue2.push(end);
-  set2.insert(end);
-
-  while (!queue1.empty() || !queue2.empty()) {
-    if ((set1.size() + set2.size()) % 100000 == 0 &&
-        !queue1.empty() && !queue2.empty()) {
-      printf("%zd %zd %d:%d\n", set1.size(), set2.size(),
-          queue1.front().pcs, queue2.front().pcs);
-    }
-
-    if (!queue1.empty()) {
-      u = queue1.front();
-      queue1.pop();
-
-      for (int x = 0; x < kN; x++)
-        for (int y = 0; y < kN; y++)
-          if (OnBoard(x, y) && u.s[x][y]) {
-            for (int d = 0; d < kDir; d++)
-              if (Move(u, x, y, d, &v) && v.CanEnd()) {
-                if (set1.count(v) == 0) {
-                  set1.insert(v);
-                  queue1.push(v);
-                  if (set2.count(v)) {
-                    puts("Found it!");
-                    return;
-                  }
-                }
-              }
-          }
-    }
-    if (!queue2.empty()) {
-      u = queue2.front();
-      queue2.pop();
-
-      for (int x = 0; x < kN; x++)
-        for (int y = 0; y < kN; y++)
-          if (OnBoard(x, y) && u.s[x][y]) {
-            for (int d = 0; d < kDir; d++)
-              if (Unmove(u, x, y, d, &v) && v.CanEnd()) {
-                if (set2.count(v) == 0) {
-                  set2.insert(v);
-                  queue2.push(v);
-                  if (set1.count(v)) {
-                    puts("Found it!");
-                    return;
-                  }
-                }
-              }
-          }
-    }
-  }
-}
-
 void PegSolitaire::ReversedBfs() {
   std::queue<State> queue;
   State end, u, v;
@@ -297,11 +234,7 @@ bool PegSolitaire::State::CanEnd() const {
         else if (NearEdge(x, y) == 1)
           d2++;
       }
-  int max = std::max(std::max(a, b), std::max(c, d));
-  int min = std::min(std::min(a, b), std::min(c, d));
-  bool succ0 = a > 0 && d1 <= c && d2 <= b;
-  bool succ1 = max - min <= 8;
-  return succ0 && succ1;
+  return a > 0 && d1 <= c && d2 <= b;
 }
 
 void PegSolitaire::State::Dump() const {
