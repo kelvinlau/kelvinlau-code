@@ -1,8 +1,10 @@
 #include "peg_solitaire.h"
 
-int main() {
+int main(int argc, char **argv) {
   PegSolitaire peg_solitaire;
-  peg_solitaire.Search(12);
-  peg_solitaire.Bfs();
+  if (argv[1][0] == 's')
+    peg_solitaire.Search(10);
+  else
+    peg_solitaire.Bfs();
   return 0;
 }

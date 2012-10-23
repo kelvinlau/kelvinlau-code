@@ -13,6 +13,10 @@ class PegSolitaire {
   static const int kDir = 4;
   static const int kDx[];
   static const int kDy[];
+  static const int kDir8 = 8;
+  static const int kDx8[];
+  static const int kDy8[];
+  static const int kCL = 6;
 
   struct State {
     void InitStart();

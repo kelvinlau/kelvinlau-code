@@ -13,6 +13,8 @@
 
 const int PegSolitaire::kDx[] = { -1, 0, 1, 0 };
 const int PegSolitaire::kDy[] = { 0, 1, 0, -1 };
+const int PegSolitaire::kDx8[] = { -1, 0, 1, 0, -1, 1, -1, 1 };
+const int PegSolitaire::kDy8[] = { 0, 1, 0, -1, 1, 1, -1, -1 };
 
 bool PegSolitaire::OnBoard(int x, int y) {
   if (x < 0 || x >= kN) return 0;
@@ -27,61 +29,78 @@ bool PegSolitaire::OnCenter(int x, int y) {
 }
 
 int PegSolitaire::NearEdge(int x, int y) {
-  return (x == 0 || x == kN - 1) | ((y == 0 || y == kN - 1) << 1);
+  return ((x == 0 || x == kN - 1) << 1) | (y == 0 || y == kN - 1);
 }
 
 bool PegSolitaire::CanMove(const State &s, int x, int y, int d) {
+  int x1 = x + kDx[d], y1 = y + kDy[d];
+  int x2 = x1 + kDx[d], y2 = y1 + kDy[d];
   if (!OnBoard(x, y)) return false;
-  if (!OnBoard(x + 2 * kDx[d], y + 2 * kDy[d])) return false;
+  if (!OnBoard(x2, y2)) return false;
   if (!s.s[x][y]) return false;
-  if (!s.s[x + kDx[d]][y + kDy[d]]) return false;
-  if (s.s[x + 2 * kDx[d]][y + 2 * kDy[d]]) return false;
-  if (NearEdge(x + 2 * kDx[d], y + 2 * kDy[d])) return false;
+  if (!s.s[x1][y1]) return false;
+  if (s.s[x2][y2]) return false;
+  if (!NearEdge(x, y) && NearEdge(x2, y2)) return false;
   if (s.pcs == 32) return d == 0;
   return true;
 }
 
 bool PegSolitaire::Move(const State &s, int x, int y, int d, State *t) {
+  int x1 = x + kDx[d], y1 = y + kDy[d];
+  int x2 = x1 + kDx[d], y2 = y1 + kDy[d];
   if (!CanMove(s, x, y, d)) return false;
   *t = s;
   t->s[x][y] = 0;
-  t->s[x + kDx[d]][y + kDy[d]] = 0;
-  t->s[x + 2 * kDx[d]][y + 2 * kDy[d]] = 1;
-  t->AddStat(x + kDx[d], y + kDy[d], -1);
+  t->s[x1][y1] = 0;
+  t->s[x2][y2] = 1;
+  t->AddStat(x1, y1, -1);
   return true;
 }
 
 bool PegSolitaire::CanUnmove(const State &s, int x, int y, int d) {
+  int x1 = x + kDx[d], y1 = y + kDy[d];
+  int x2 = x1 + kDx[d], y2 = y1 + kDy[d];
   if (!OnBoard(x, y)) return false;
-  if (!OnBoard(x + 2 * kDx[d], y + 2 * kDy[d])) return false;
+  if (!OnBoard(x2, y2)) return false;
   if (!s.s[x][y]) return false;
-  if (s.s[x + kDx[d]][y + kDy[d]]) return false;
-  if (s.s[x + 2 * kDx[d]][y + 2 * kDy[d]]) return false;
-  if (NearEdge(x, y)) return false;
+  if (s.s[x1][y1]) return false;
+  if (s.s[x2][y2]) return false;
+  if (NearEdge(x, y) && !NearEdge(x2, y2)) return false;
   return true;
 }
 
 bool PegSolitaire::Unmove(const State &s, int x, int y, int d, State *t) {
+  int x1 = x + kDx[d], y1 = y + kDy[d];
+  int x2 = x1 + kDx[d], y2 = y1 + kDy[d];
   if (!CanUnmove(s, x, y, d)) return false;
   *t = s;
   t->s[x][y] = 0;
-  t->s[x + kDx[d]][y + kDy[d]] = 1;
-  t->s[x + 2 * kDx[d]][y + 2 * kDy[d]] = 1;
-  t->AddStat(x + kDx[d], y + kDy[d], 1);
+  t->s[x1][y1] = 1;
+  t->s[x2][y2] = 1;
+  t->AddStat(x1, y1, 1);
   return true;
 }
 
 int PegSolitaire::Heuristic(const State &s) {
   int h = 0;
-  int num[] = { s.a + 1, s.b, s.c, s.d };
+  int num[] = { s.d, s.b, s.c, s.a };
   for (int i = 0; i < 4; i++)
     for (int j = i + 1; j < 4; j++)
       if ((i ^ j) != 3)
         h += abs(num[i] - num[j]);
-  for (int x = 0; x < kN; x += 2)
-    for (int y = 0; y < kN; y += 2)
+  for (int x = 0; x < kN; x++)
+    for (int y = 0; y < kN; y++)
       if (OnBoard(x, y) && s.s[x][y]) {
-        if (NearEdge(x, y))
+        int neighbours = 0;
+        for (int d = 0; d < kDir8; d++) {
+          int x1 = x + kDx8[d];
+          int y1 = y + kDy8[d];
+          if (OnBoard(x1, y1) && s.s[x1][y1])
+            neighbours++;
+        }
+        if (!neighbours)
+          h += 7;
+        if (x % 2 == 0 && y % 2 == 0)
           h += 4;
       }
   return h;
@@ -113,17 +132,19 @@ void PegSolitaire::Bfs() {
 
       for (int x = 0; x < kN; x++)
         for (int y = 0; y < kN; y++)
-          for (int d = 0; d < kDir; d++)
-            if (Move(u, x, y, d, &v) && v.CanEnd()) {
-              if (set1.count(v) == 0) {
-                set1.insert(v);
-                queue1.push(v);
-                if (set2.count(v)) {
-                  puts("Found it!");
-                  return;
+          if (OnBoard(x, y) && u.s[x][y]) {
+            for (int d = 0; d < kDir; d++)
+              if (Move(u, x, y, d, &v) && v.CanEnd()) {
+                if (set1.count(v) == 0) {
+                  set1.insert(v);
+                  queue1.push(v);
+                  if (set2.count(v)) {
+                    puts("Found it!");
+                    return;
+                  }
                 }
               }
-            }
+          }
     }
     if (!queue2.empty()) {
       u = queue2.front();
@@ -131,17 +152,19 @@ void PegSolitaire::Bfs() {
 
       for (int x = 0; x < kN; x++)
         for (int y = 0; y < kN; y++)
-          for (int d = 0; d < kDir; d++)
-            if (Unmove(u, x, y, d, &v) && v.CanEnd()) {
-              if (set2.count(v) == 0) {
-                set2.insert(v);
-                queue2.push(v);
-                if (set1.count(v)) {
-                  puts("Found it!");
-                  return;
+          if (OnBoard(x, y) && u.s[x][y]) {
+            for (int d = 0; d < kDir; d++)
+              if (Unmove(u, x, y, d, &v) && v.CanEnd()) {
+                if (set2.count(v) == 0) {
+                  set2.insert(v);
+                  queue2.push(v);
+                  if (set1.count(v)) {
+                    puts("Found it!");
+                    return;
+                  }
                 }
               }
-            }
+          }
     }
   }
 }
@@ -198,8 +221,8 @@ bool PegSolitaire::Dfs(const State &u) {
   if (u.pcs <= limit_)
     return set2_.count(u);
 
-  //printf("%d\n", u.pcs);
-  //u.Dump();
+//  if (rand() % 100000 == 0)
+//    u.Dump();
 
   State v;
   std::vector<std::pair<int, int> > candidates;
@@ -215,18 +238,20 @@ bool PegSolitaire::Dfs(const State &u) {
       }
     }
   std::sort(candidates.begin(), candidates.end());
-  for (int i = 0; i < candidates.size(); i++) {
+  for (int i = 0; i < candidates.size() && i < kCL; i++) {
     int c = candidates[i].second;
     int x = c / kDir / kN;
     int y = c / kDir % kN;
     int d = c % kDir;
     Move(u, x, y, d, &v);
-    set1_.insert(v);
-    if (Dfs(v)) {
-      v.Dump();
-      return true;
+    if (!set1_.count(v)) {
+      set1_.insert(v);
+      if (Dfs(v)) {
+        v.Dump();
+        return true;
+      }
+      //set1_.erase(v);
     }
-    //set1_.erase(v);
   }
   return false;
 }
@@ -248,7 +273,7 @@ void PegSolitaire::State::InitStart() {
 void PegSolitaire::State::InitEnd() {
   for (int x = 0; x < kN; x++)
     for (int y = 0; y < kN; y++)
-      s[x][y] = OnBoard(x, y) && OnCenter(x, y);
+      s[x][y] = OnCenter(x, y);
   a = 1;
   b = c = d = 0;
   pcs = 1;
@@ -259,12 +284,7 @@ bool PegSolitaire::State::IsEnd() const {
   if (b != 0) return false;
   if (c != 0) return false;
   if (d != 0) return false;
-  for (int x = 0; x < kN; x++)
-    for (int y = 0; y < kN; y++)
-      if (OnBoard(x, y))
-        if (s[x][y] ^ OnCenter(x, y))
-          return false;
-  return true;
+  return s[kCenter][kCenter];
 }
 
 bool PegSolitaire::State::CanEnd() const {
@@ -272,14 +292,14 @@ bool PegSolitaire::State::CanEnd() const {
   for (int x = 0; x < kN; x += 2)
     for (int y = 0; y < kN; y += 2)
       if (OnBoard(x, y) && s[x][y]) {
-        if (NearEdge(x, y) == 1)
+        if (NearEdge(x, y) == 2)
           d1++;
-        else if (NearEdge(x, y) == 2)
+        else if (NearEdge(x, y) == 1)
           d2++;
       }
   int max = std::max(std::max(a, b), std::max(c, d));
   int min = std::min(std::min(a, b), std::min(c, d));
-  bool succ0 = a > 0 && d1 <= b && d2 <= c;
+  bool succ0 = a > 0 && d1 <= c && d2 <= b;
   bool succ1 = max - min <= 8;
   return succ0 && succ1;
 }
@@ -290,11 +310,13 @@ void PegSolitaire::State::Dump() const {
       if (OnBoard(x, y)) {
         putchar(s[x][y] ? 'o' : '.');
       } else {
-        putchar('-');
+        putchar(' ');
       }
+      putchar(' ');
     }
     puts("");
   }
+  printf("%d %d %d %d = %d\n", a, b, c, d, pcs);
   puts("");
 }
 
@@ -306,10 +328,10 @@ void PegSolitaire::State::AddStat(int x, int y, int delta) {
       d += delta;
       break;
     case 1:
-      c += delta;
+      b += delta;
       break;
     case 2:
-      b += delta;
+      c += delta;
       break;
     case 3:
       a += delta;
