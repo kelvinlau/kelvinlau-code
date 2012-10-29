@@ -156,9 +156,6 @@ bool PegSolitaire::Dfs(const State &u) {
   if (u.pcs <= limit_)
     return set2_.count(u);
 
-//  if (rand() % 100000 == 0)
-//    u.Dump();
-
   State v;
   std::vector<std::pair<int, int> > candidates;
   for (int x = 0; x < kN; x++)
