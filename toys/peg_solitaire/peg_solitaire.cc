@@ -41,7 +41,7 @@ bool PegSolitaire::CanMove(const State &s, int x, int y, int d) {
   if (!s.s[x1][y1]) return false;
   if (s.s[x2][y2]) return false;
   if (!NearEdge(x, y) && NearEdge(x2, y2)) return false;
-  if (s.pcs == 32) return d == 0;
+  if (s.pcs == kPcs) return d == 0;
   return true;
 }
 
