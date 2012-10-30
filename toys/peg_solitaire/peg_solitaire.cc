@@ -21,7 +21,7 @@ bool PegSolitaire::OnBoard(int x, int y) {
   if (y < 0 || y >= kN) return 0;
   if (x >= kN / 2) x = kN - 1 - x;
   if (y >= kN / 2) y = kN - 1 - y;
-  return x >= 2 || y >= 2;
+  return x + y >= 2;
 }
 
 bool PegSolitaire::OnCenter(int x, int y) {
@@ -92,9 +92,9 @@ int PegSolitaire::Heuristic(const State &s) {
     for (int y = 0; y < kN; y++)
       if (OnBoard(x, y) && s.s[x][y]) {
         int neighbours = 0;
-        for (int d = 0; d < kDir8; d++) {
-          int x1 = x + kDx8[d];
-          int y1 = y + kDy8[d];
+        for (int d = 0; d < kDir; d++) {
+          int x1 = x + kDx[d];
+          int y1 = y + kDy[d];
           if (OnBoard(x1, y1) && s.s[x1][y1])
             neighbours++;
         }
@@ -182,7 +182,6 @@ bool PegSolitaire::Dfs(const State &u) {
         v.Dump();
         return true;
       }
-      //set1_.erase(v);
     }
   }
   return false;
@@ -196,7 +195,7 @@ void PegSolitaire::State::InitStart() {
   for (int x = 0; x < kN; x++)
     for (int y = 0; y < kN; y++)
       s[x][y] = OnBoard(x, y) && !OnCenter(x, y);
-  a = 4;
+  a = 8;
   b = c = 8;
   d = 12;
   pcs = a + b + c + d;

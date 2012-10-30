@@ -10,14 +10,14 @@ class PegSolitaire {
  public:
   static const int kN = 7;
   static const int kCenter = kN / 2;
-  static const int kPcs = 32;
+  static const int kPcs = 36;
   static const int kDir = 4;
   static const int kDx[];
   static const int kDy[];
   static const int kDir8 = 8;
   static const int kDx8[];
   static const int kDy8[];
-  static const int kCL = 4;
+  static const int kCL = 5;
 
   struct State {
     void InitStart();
