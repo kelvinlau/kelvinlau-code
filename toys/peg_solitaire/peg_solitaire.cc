@@ -225,7 +225,7 @@ void PegSolitaire::State::InitEnd() {
 }
 
 bool PegSolitaire::State::IsEnd() const {
-  return pcs == 1 && (x == 0 && y == 4);
+  return pcs == 1 && s[0][4];
 }
 
 bool PegSolitaire::State::CanEnd() const {
