@@ -10,6 +10,7 @@ class PegSolitaire {
  public:
   static const int kN = 7;
   static const int kCenter = kN / 2;
+  static const int kPcs = 32;
   static const int kDir = 4;
   static const int kDx[];
   static const int kDy[];
