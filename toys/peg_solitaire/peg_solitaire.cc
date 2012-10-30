@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include <algorithm>
 #include <queue>
@@ -40,8 +41,7 @@ bool PegSolitaire::CanMove(const State &s, int x, int y, int d) {
   if (!s.s[x][y]) return false;
   if (!s.s[x1][y1]) return false;
   if (s.s[x2][y2]) return false;
-  if (!NearEdge(x, y) && NearEdge(x2, y2)) return false;
-  if (s.pcs == kPcs) return d == 0;
+//  if (!NearEdge(x, y) && NearEdge(x2, y2)) return false;
   return true;
 }
 
@@ -65,7 +65,7 @@ bool PegSolitaire::CanUnmove(const State &s, int x, int y, int d) {
   if (!s.s[x][y]) return false;
   if (s.s[x1][y1]) return false;
   if (s.s[x2][y2]) return false;
-  if (NearEdge(x, y) && !NearEdge(x2, y2)) return false;
+//  if (NearEdge(x, y) && !NearEdge(x2, y2)) return false;
   return true;
 }
 
@@ -83,7 +83,7 @@ bool PegSolitaire::Unmove(const State &s, int x, int y, int d, State *t) {
 
 int PegSolitaire::Heuristic(const State &s) {
   int h = 0;
-  int num[] = { s.d, s.b, s.c, s.a };
+  int num[] = { s.d, s.b, s.c, s.a + 4 };
   for (int i = 0; i < 4; i++)
     for (int j = i + 1; j < 4; j++)
       if ((i ^ j) != 3)
@@ -92,9 +92,9 @@ int PegSolitaire::Heuristic(const State &s) {
     for (int y = 0; y < kN; y++)
       if (OnBoard(x, y) && s.s[x][y]) {
         int neighbours = 0;
-        for (int d = 0; d < kDir; d++) {
-          int x1 = x + kDx[d];
-          int y1 = y + kDy[d];
+        for (int d = 0; d < kDir8; d++) {
+          int x1 = x + kDx8[d];
+          int y1 = y + kDy8[d];
           if (OnBoard(x1, y1) && s.s[x1][y1])
             neighbours++;
         }
@@ -112,9 +112,16 @@ void PegSolitaire::ReversedBFS() {
   queue.push(end);
   set2_.insert(end);
 
+  int s = 0;
+
   while (!queue.empty()) {
     u = queue.front();
     queue.pop();
+
+    if (u.pcs > s) {
+      s = u.pcs;
+      printf("%d\n", s);
+    }
 
     if (u.pcs >= limit_)
       break;
@@ -138,8 +145,11 @@ void PegSolitaire::ReversedBFS() {
 void PegSolitaire::Search(int limit) {
   limit_ = limit;
 
+  srand(time(0));
+
   set2_.clear();
   ReversedBFS();
+  printf("set2=%zd\n", set2_.size());
   puts("Done ReversedBFS");
 
   State start;
@@ -150,6 +160,7 @@ void PegSolitaire::Search(int limit) {
   if (Dfs(start)) {
     puts("Found it!");
   }
+  printf("set1=%zd\n", set1_.size());
 }
 
 bool PegSolitaire::Dfs(const State &u) {
@@ -182,6 +193,8 @@ bool PegSolitaire::Dfs(const State &u) {
         v.Dump();
         return true;
       }
+      if (set1_.size() > kStateLimit)
+        return false;
     }
   }
   return false;
@@ -194,19 +207,20 @@ bool PegSolitaire::Dfs(const State &u) {
 void PegSolitaire::State::InitStart() {
   for (int x = 0; x < kN; x++)
     for (int y = 0; y < kN; y++)
-      s[x][y] = OnBoard(x, y) && !OnCenter(x, y);
-  a = 8;
+      s[x][y] = OnBoard(x, y) && !(x == 0 && y == 2);
+  a = 9;
   b = c = 8;
-  d = 12;
+  d = 11;
   pcs = a + b + c + d;
 }
 
 void PegSolitaire::State::InitEnd() {
   for (int x = 0; x < kN; x++)
     for (int y = 0; y < kN; y++)
-      s[x][y] = OnCenter(x, y);
-  a = 1;
-  b = c = d = 0;
+      s[x][y] = (x == 0 && y == 4);
+  a = 0;
+  b = c = 0;
+  d = 1;
   pcs = a + b + c + d;
 }
 
@@ -217,7 +231,8 @@ bool PegSolitaire::State::IsEnd() const {
 bool PegSolitaire::State::CanEnd() const {
   int d1 = s[0][2] + s[0][4] + s[6][0] + s[6][2];
   int d2 = s[2][0] + s[4][0] + s[0][6] + s[2][6];
-  return a > 0 && d1 <= c && d2 <= b;
+  int a1 = s[1][1] + s[1][5] + s[5][1] + s[5][5];
+  return d > 0 && d1 - 1 <= c && d2 - 1 <= b && a <= b + c;
 }
 
 void PegSolitaire::State::Dump() const {

@@ -17,7 +17,8 @@ class PegSolitaire {
   static const int kDir8 = 8;
   static const int kDx8[];
   static const int kDy8[];
-  static const int kCL = 5;
+  static const int kCL = 3;
+  static const int kStateLimit = 10000000;
 
   struct State {
     void InitStart();
