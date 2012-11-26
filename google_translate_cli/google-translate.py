@@ -51,7 +51,7 @@ def main():
         break
   shell_mode = '-s' in argv or '--shell' in argv
 
-  if len(argv) == 2 and argv[1] in ('-s', '--shell'):
+  if shell_mode:
     while True:
       try:
         text = raw_input('>> ')
