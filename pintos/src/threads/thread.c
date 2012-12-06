@@ -209,6 +209,9 @@ thread_create (const char *name, int priority,
   /* Add to run queue. */
   thread_unblock (t);
 
+  if (t->priority > thread_current ()->priority)
+    thread_yield ();
+
   return tid;
 }
 
@@ -245,7 +248,7 @@ thread_unblock (struct thread *t)
 
   old_level = intr_disable ();
   ASSERT (t->status == THREAD_BLOCKED);
-  list_push_back (&ready_list, &t->elem);
+  list_insert_ordered (&ready_list, &t->elem, thread_priority_greater, NULL);
   t->status = THREAD_READY;
   intr_set_level (old_level);
 }
@@ -316,7 +319,8 @@ thread_yield (void)
 
   old_level = intr_disable ();
   if (cur != idle_thread) 
-    list_push_back (&ready_list, &cur->elem);
+    list_insert_ordered (&ready_list, &cur->elem, thread_priority_greater,
+                         NULL);
   cur->status = THREAD_READY;
   schedule ();
   intr_set_level (old_level);
@@ -343,7 +347,21 @@ thread_foreach (thread_action_func *func, void *aux)
 void
 thread_set_priority (int new_priority) 
 {
-  thread_current ()->priority = new_priority;
+  struct thread *cur = thread_current (), *t;
+
+  cur->priority = cur->priority_original = new_priority;
+  if (!list_empty (&cur->donater)) {
+    t = list_entry (list_front (&cur->donater), struct thread, donater_elem);
+    if (cur->priority < t->priority)
+      cur->priority = t->priority;
+  }
+  if (!list_empty (&ready_list)) {
+    t = list_entry (list_front (&ready_list), struct thread, elem);
+    if (t->priority > cur->priority)
+      thread_yield ();
+  }
+
+  ASSERT (cur->donatee == NULL);
 }
 
 /* Returns the current thread's priority. */
@@ -351,6 +369,75 @@ int
 thread_get_priority (void) 
 {
   return thread_current ()->priority;
+}
+
+bool
+thread_priority_greater (const struct list_elem *a,
+                      const struct list_elem *b,
+                      void *aux UNUSED)
+{
+  struct thread *ta = pg_round_down (a);
+  struct thread *tb = pg_round_down (b);
+  return ta->priority > tb->priority;
+}
+
+/* Max depth of priority donation. */
+#define MAX_DONATION_DEPTH 8
+
+static bool
+donation_adjust (struct thread *parent, struct thread *child)
+{
+  if (parent->priority < child->priority) {
+    parent->priority = child->priority;
+    if (parent->status == THREAD_BLOCKED || parent->status == THREAD_READY)
+      list_adjust_order_left (&parent->elem, thread_priority_greater, NULL);
+    return true;
+  }
+  return false;
+}
+
+void
+thread_donation_add (struct thread *parent, struct thread *child)
+{
+  int depth = 0;
+
+  ASSERT (child->donatee == NULL);
+
+  child->donatee = parent;
+  list_insert_ordered (&parent->donater, &child->donater_elem,
+                       thread_priority_greater, NULL);
+  if (!donation_adjust(parent, child))
+    return;
+
+  while (parent->donatee && ++depth <= MAX_DONATION_DEPTH) {
+    child = parent;
+    parent = parent->donatee;
+    list_adjust_order_left (&child->donater_elem, thread_priority_greater,
+                             NULL);
+    if (!donation_adjust(parent, child))
+      return;
+  }
+}
+
+void
+thread_donation_remove (struct thread *parent, struct thread *child)
+{
+  struct thread *t;
+
+  ASSERT (child->donatee == parent);
+
+  child->donatee = NULL;
+  list_remove (&child->donater_elem);
+  parent->priority = parent->priority_original;
+  if (!list_empty (&parent->donater))
+    {
+      t = list_entry (list_front (&parent->donater),
+                      struct thread, donater_elem);
+      ASSERT (is_thread (t));
+      if (parent->priority < t->priority)
+        parent->priority = t->priority;
+    }
+  ASSERT (parent->donatee == NULL);
 }
 
 /* Sets the current thread's nice value to NICE. */
@@ -467,10 +554,12 @@ init_thread (struct thread *t, const char *name, int priority)
   t->status = THREAD_BLOCKED;
   strlcpy (t->name, name, sizeof t->name);
   t->stack = (uint8_t *) t + PGSIZE;
-  t->priority = priority;
+  t->priority = t->priority_original = priority;
   t->magic = THREAD_MAGIC;
   list_push_back (&all_list, &t->allelem);
   t->wake_up_ticks = THREAD_NOT_SLEEPING;
+  list_init (&t->donater);
+  t->donatee = NULL;
 }
 
 /* Allocates a SIZE-byte frame at the top of thread T's stack and

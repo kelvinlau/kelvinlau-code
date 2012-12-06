@@ -458,6 +458,30 @@ list_insert_ordered (struct list *list, struct list_elem *elem,
   return list_insert (e, elem);
 }
 
+/* Adjusts ELEM in the proper position in LIST, which must be
+   sorted according to LESS given auxiliary data AUX.
+   Assumed ELEM should be in a position closer to the list's head.
+   Runs in O(n) average case in the number of elements in LIST. */
+void
+list_adjust_order_left (struct list_elem *elem,
+                        list_less_func *less, void *aux)
+{
+  struct list_elem *e;
+
+  ASSERT (elem != NULL);
+  ASSERT (less != NULL);
+  ASSERT (is_interior (elem));
+
+  e = list_prev (elem);
+  list_remove (elem);
+  while (!is_head (e)) {
+    if (!less (elem, e, aux))
+      break;
+    e = list_prev (e);
+  }
+  return list_insert (list_next (e), elem);
+}
+
 /* Iterates through LIST and removes all but the first in each
    set of adjacent elements that are equal according to LESS
    given auxiliary data AUX.  If DUPLICATES is non-null, then the
