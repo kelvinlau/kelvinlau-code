@@ -24,9 +24,6 @@ typedef int tid_t;
 #define PRI_DEFAULT 31                  /* Default priority. */
 #define PRI_MAX 63                      /* Highest priority. */
 
-/* For timer_sleep. */
-#define THREAD_NOT_SLEEPING -1
-
 /* A kernel thread or user process.
 
    Each thread structure is stored in its own 4 kB page.  The
@@ -105,7 +102,8 @@ struct thread
     unsigned magic;                     /* Detects stack overflow. */
 
     /* Owned by timer.c. */
-    int64_t wake_up_ticks;              /* For timer_sleep. */
+    int64_t wakeup_ticks;               /* When to wake up. */
+    struct list_elem sleep_elem;        /* For sleep_threads list. */
   };
 
 /* If false (default), use round-robin scheduler.
