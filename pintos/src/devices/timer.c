@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "devices/pit.h"
 #include "threads/interrupt.h"
+#include "threads/malloc.h"
 #include "threads/synch.h"
 #include "threads/thread.h"
   
@@ -30,6 +31,18 @@ static void busy_wait (int64_t loops);
 static void real_time_sleep (int64_t num, int32_t denom);
 static void real_time_delay (int64_t num, int32_t denom);
 
+/* For timer_sleep(). */
+static struct list sleep_threads;
+
+static bool
+sleep_thread_less (const struct list_elem *a,
+                   const struct list_elem *b, void *aux UNUSED) {
+  struct thread *t1, *t2;
+  t1 = list_entry (a, struct thread, sleep_elem);
+  t2 = list_entry (b, struct thread, sleep_elem);
+  return t1->wakeup_ticks < t2->wakeup_ticks;
+}
+
 /* Sets up the timer to interrupt TIMER_FREQ times per second,
    and registers the corresponding interrupt. */
 void
@@ -37,6 +50,7 @@ timer_init (void)
 {
   pit_configure_channel (0, 2, TIMER_FREQ);
   intr_register_ext (0x20, timer_interrupt, "8254 Timer");
+  list_init (&sleep_threads);
 }
 
 /* Calibrates loops_per_tick, used to implement brief delays. */
@@ -89,11 +103,18 @@ timer_elapsed (int64_t then)
 void
 timer_sleep (int64_t ticks) 
 {
+  struct thread *cur;
+
   ASSERT (intr_get_level () == INTR_ON);
+
+  if (ticks <= 0) return;
+
   intr_disable ();
-  thread_current ()->wake_up_ticks = timer_ticks () + ticks;
-  if (ticks > 0)
-    thread_block ();
+  cur = thread_current ();
+  cur->wakeup_ticks = timer_ticks () + ticks;
+  list_insert_ordered (&sleep_threads, &cur->sleep_elem,
+                       sleep_thread_less, NULL);
+  thread_block ();
   intr_set_level (INTR_ON);
 }
 
@@ -167,32 +188,26 @@ timer_print_stats (void)
   printf ("Timer: %"PRId64" ticks\n", timer_ticks ());
 }
 
-/* Wake up a thread if it should be waked up from timer_sleep(). */
-static void
-check_thread_wake_up (struct thread *thread, void *args) 
-{
-  ASSERT (intr_get_level () == INTR_OFF);
-  if (thread->wake_up_ticks != THREAD_NOT_SLEEPING &&
-      thread->wake_up_ticks <= timer_ticks () &&
-      thread->status == THREAD_BLOCKED)
-    {
-      thread->wake_up_ticks = THREAD_NOT_SLEEPING;
-      thread_unblock (thread);
-    }
-}
-
 /* Timer interrupt handler. */
 static void
 timer_interrupt (struct intr_frame *args UNUSED)
 {
-  enum intr_level old_level;
+  struct thread *t;
+  struct list_elem *e;
 
   ticks++;
   thread_tick ();
 
-  old_level = intr_disable ();
-  thread_foreach (check_thread_wake_up, NULL);
-  intr_set_level (old_level);
+  while (!list_empty (&sleep_threads)) {
+    e = list_front (&sleep_threads);
+    t = list_entry (e, struct thread, sleep_elem);
+    if (t->wakeup_ticks <= ticks) {
+      thread_unblock (t);
+      list_pop_front (&sleep_threads);
+    } else {
+      break;
+    }
+  }
 }
 
 /* Returns true if LOOPS iterations waits for more than one timer
