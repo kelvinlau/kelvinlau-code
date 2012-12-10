@@ -202,8 +202,10 @@ timer_interrupt (struct intr_frame *args UNUSED)
     e = list_front (&sleep_threads);
     t = list_entry (e, struct thread, sleep_elem);
     if (t->wakeup_ticks <= ticks) {
-      thread_unblock (t);
       list_pop_front (&sleep_threads);
+      thread_unblock (t);
+      if (t->priority > thread_current ()->priority)
+        intr_yield_on_return ();
     } else {
       break;
     }

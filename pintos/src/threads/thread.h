@@ -109,12 +109,18 @@ struct thread
     struct list donater;                /* Children in donation tree. */
     struct list_elem donater_elem;      /* List elem for donater. */
     struct thread* donatee;             /* Parent in donation tree. */
+
+    /* mlfqs. */
+    int nice;                           /* Nice value. */
+    int recent_cpu;
   };
 
 /* If false (default), use round-robin scheduler.
    If true, use multi-level feedback queue scheduler.
    Controlled by kernel command-line option "-o mlfqs". */
 extern bool thread_mlfqs;
+
+void thread_mlfqs_update (void);
 
 void thread_init (void);
 void thread_start (void);
