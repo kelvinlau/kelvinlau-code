@@ -120,8 +120,6 @@ struct thread
    Controlled by kernel command-line option "-o mlfqs". */
 extern bool thread_mlfqs;
 
-void thread_mlfqs_update (void);
-
 void thread_init (void);
 void thread_start (void);
 
