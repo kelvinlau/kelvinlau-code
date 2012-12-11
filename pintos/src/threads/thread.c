@@ -261,7 +261,7 @@ thread_unblock (struct thread *t)
 
   old_level = intr_disable ();
   ASSERT (t->status == THREAD_BLOCKED);
-  list_insert_ordered (&ready_list, &t->elem, thread_priority_greater, NULL);
+  list_push_back (&ready_list, &t->elem);
   ready_list_size++;
   t->status = THREAD_READY;
   intr_set_level (old_level);
@@ -333,8 +333,7 @@ thread_yield (void)
 
   old_level = intr_disable ();
   if (cur != idle_thread) {
-    list_insert_ordered (&ready_list, &cur->elem, thread_priority_greater,
-                         NULL);
+    list_push_back (&ready_list, &cur->elem);
     ready_list_size++;
   }
   cur->status = THREAD_READY;
@@ -367,12 +366,14 @@ thread_set_priority (int new_priority)
 
   cur->priority = cur->priority_original = new_priority;
   if (!list_empty (&cur->donater)) {
-    t = list_entry (list_front (&cur->donater), struct thread, donater_elem);
+    t = list_entry (list_min (&cur->donater, thread_priority_greater, NULL),
+                    struct thread, donater_elem);
     if (cur->priority < t->priority)
       cur->priority = t->priority;
   }
   if (!list_empty (&ready_list)) {
-    t = list_entry (list_front (&ready_list), struct thread, elem);
+    t = list_entry (list_min (&ready_list, thread_priority_greater, NULL),
+                    struct thread, elem);
     if (t->priority > cur->priority)
       thread_yield ();
   }
@@ -389,8 +390,8 @@ thread_get_priority (void)
 
 bool
 thread_priority_greater (const struct list_elem *a,
-                      const struct list_elem *b,
-                      void *aux UNUSED)
+                         const struct list_elem *b,
+                         void *aux UNUSED)
 {
   struct thread *ta = pg_round_down (a);
   struct thread *tb = pg_round_down (b);
@@ -400,18 +401,6 @@ thread_priority_greater (const struct list_elem *a,
 /* Max depth of priority donation. */
 #define MAX_DONATION_DEPTH 8
 
-static bool
-donation_adjust (struct thread *parent, struct thread *child)
-{
-  if (parent->priority < child->priority) {
-    parent->priority = child->priority;
-    if (parent->status == THREAD_BLOCKED || parent->status == THREAD_READY)
-      list_adjust_order_left (&parent->elem, thread_priority_greater, NULL);
-    return true;
-  }
-  return false;
-}
-
 void
 thread_donation_add (struct thread *parent, struct thread *child)
 {
@@ -420,17 +409,18 @@ thread_donation_add (struct thread *parent, struct thread *child)
   ASSERT (child->donatee == NULL);
 
   child->donatee = parent;
-  list_insert_ordered (&parent->donater, &child->donater_elem,
-                       thread_priority_greater, NULL);
-  if (!donation_adjust(parent, child))
+  list_push_back (&parent->donater, &child->donater_elem);
+  if (parent->priority < child->priority)
+    parent->priority = child->priority;
+  else
     return;
 
   while (parent->donatee && ++depth <= MAX_DONATION_DEPTH) {
     child = parent;
     parent = parent->donatee;
-    list_adjust_order_left (&child->donater_elem, thread_priority_greater,
-                             NULL);
-    if (!donation_adjust(parent, child))
+    if (parent->priority < child->priority)
+      parent->priority = child->priority;
+    else
       return;
   }
 }
@@ -439,20 +429,20 @@ void
 thread_donation_remove (struct thread *parent, struct thread *child)
 {
   struct thread *t;
+  struct list_elem *e;
 
   ASSERT (child->donatee == parent);
 
   child->donatee = NULL;
   list_remove (&child->donater_elem);
   parent->priority = parent->priority_original;
-  if (!list_empty (&parent->donater))
-    {
-      t = list_entry (list_front (&parent->donater),
-                      struct thread, donater_elem);
-      ASSERT (is_thread (t));
-      if (parent->priority < t->priority)
-        parent->priority = t->priority;
-    }
+  if (!list_empty (&parent->donater)) {
+    e = list_min (&parent->donater, thread_priority_greater, NULL);
+    t = list_entry (e, struct thread, donater_elem);
+    ASSERT (is_thread (t));
+    if (parent->priority < t->priority)
+      parent->priority = t->priority;
+  }
   ASSERT (parent->donatee == NULL);
 }
 
@@ -503,7 +493,6 @@ void thread_mlfqs_update (void) {
     load_avg = (59 * load_avg + FIX (ready_threads)) / 60;
     coef = FIX_DIV (load_avg << 1, (load_avg << 1) + FIX (1));
     thread_foreach (mlfqs_update_one, &coef);
-    list_sort (&ready_list, thread_priority_greater, NULL);
   }
 }
 
@@ -625,7 +614,8 @@ next_thread_to_run (void)
   if (list_empty (&ready_list))
     return idle_thread;
   else {
-    e = list_pop_front (&ready_list);
+    e = list_min (&ready_list, thread_priority_greater, NULL);
+    list_remove (e);
     ready_list_size--;
     return list_entry (e, struct thread, elem);
   }
