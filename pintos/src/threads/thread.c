@@ -65,6 +65,8 @@ bool thread_mlfqs;
 
 static int load_avg;
 
+static void mlfqs_update (void);
+
 static void kernel_thread (thread_func *, void *aux);
 
 static void idle (void *aux UNUSED);
@@ -154,7 +156,7 @@ thread_tick (void)
 
   /* mlfqs. */
   if (thread_mlfqs)
-    thread_mlfqs_update ();
+    mlfqs_update ();
 }
 
 /* Prints thread statistics. */
@@ -496,29 +498,43 @@ thread_get_recent_cpu (void)
   return FIX_INT(thread_current ()->recent_cpu * 100);
 }
 
-/* Helper function to update MLFQS data for a single thread. */
-static void mlfqs_update_one (struct thread *t, void *coef_) {
-  int64_t coef = *(int64_t *)coef_;
+/* Helper function to update MLFQS recent_cpu for a single thread. */
+static void mlfqs_update_recent_cpu (struct thread *t, void *coef_) {
+  int64_t *coef = (int64_t *)coef_;
+  t->recent_cpu = FIX_MUL (*coef, t->recent_cpu) + FIX (t->nice);
+}
+
+/* Helper function to update MLFQS priority for a single thread. */
+static void mlfqs_update_priority (struct thread *t, void *aux UNUSED) {
   int priority;
-  t->recent_cpu = FIX_MUL (coef, t->recent_cpu) + FIX (t->nice);
   priority = PRI_MAX - FIX_INT (t->recent_cpu >> 2) - (t->nice << 1);
   if (priority < PRI_MIN) priority = PRI_MIN;
   if (priority > PRI_MAX) priority = PRI_MAX;
   update_priority (t, priority);
 }
 
-/* Update MLFQS data. Called once a tick. */
-void thread_mlfqs_update (void) {
+/* Update all MLFQS data. Called once a tick. */
+static void mlfqs_update (void) {
   struct thread *cur = thread_current ();
   int ready_threads;
   int64_t coef;
 
+  /* load_avg. */
+  if (timer_ticks () % TIMER_FREQ == 0) {
+    ready_threads = ready_list_size + (cur != idle_thread);
+    load_avg = (59 * load_avg + FIX (ready_threads)) / 60;
+  }
+
+  /* recent_cpu. */
   cur->recent_cpu += FIX (1);
   if (timer_ticks () % TIMER_FREQ == 0) {
-    ready_threads = ready_list_size + (thread_current () != idle_thread);
-    load_avg = (59 * load_avg + FIX (ready_threads)) / 60;
     coef = FIX_DIV (load_avg << 1, (load_avg << 1) + FIX (1));
-    thread_foreach (mlfqs_update_one, &coef);
+    thread_foreach (mlfqs_update_recent_cpu, &coef);
+  }
+
+  /* priority. */
+  if (timer_ticks () % 4 == 0) {
+    thread_foreach (mlfqs_update_priority, NULL);
   }
 }
 
