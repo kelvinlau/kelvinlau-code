@@ -24,7 +24,7 @@
 
 /* List of processes in THREAD_READY state, that is, processes
    that are ready to run but not actually running. */
-static struct list ready_list;
+static struct list ready_list[PRI_MAX + 1];
 static int ready_list_size;
 
 /* List of all processes.  Processes are added to this list
@@ -92,10 +92,13 @@ static tid_t allocate_tid (void);
 void
 thread_init (void) 
 {
+  int p;
+
   ASSERT (intr_get_level () == INTR_OFF);
 
   lock_init (&tid_lock);
-  list_init (&ready_list);
+  for (p = PRI_MIN; p <= PRI_MAX; ++p)
+    list_init (&ready_list[p]);
   ready_list_size = 0;
   list_init (&all_list);
 
@@ -261,7 +264,7 @@ thread_unblock (struct thread *t)
 
   old_level = intr_disable ();
   ASSERT (t->status == THREAD_BLOCKED);
-  list_push_back (&ready_list, &t->elem);
+  list_push_back (&ready_list[t->priority], &t->elem);
   ready_list_size++;
   t->status = THREAD_READY;
   intr_set_level (old_level);
@@ -333,7 +336,7 @@ thread_yield (void)
 
   old_level = intr_disable ();
   if (cur != idle_thread) {
-    list_push_back (&ready_list, &cur->elem);
+    list_push_back (&ready_list[cur->priority], &cur->elem);
     ready_list_size++;
   }
   cur->status = THREAD_READY;
@@ -358,6 +361,18 @@ thread_foreach (thread_action_func *func, void *aux)
     }
 }
 
+/* Helper function to set a new priority for a thread, move the thread to the
+ * correct ready_list if needed. */
+static void update_priority (struct thread *t, int priority) {
+  if (t->priority == priority)
+    return;
+  if (t->status == THREAD_READY && t != idle_thread) {
+    list_remove (&t->elem);
+    list_push_back (&ready_list[priority], &t->elem);
+  }
+  t->priority = priority;
+}
+
 /* Sets the current thread's priority to NEW_PRIORITY. */
 void
 thread_set_priority (int new_priority) 
@@ -371,12 +386,7 @@ thread_set_priority (int new_priority)
     if (cur->priority < t->priority)
       cur->priority = t->priority;
   }
-  if (!list_empty (&ready_list)) {
-    t = list_entry (list_min (&ready_list, thread_priority_greater, NULL),
-                    struct thread, elem);
-    if (t->priority > cur->priority)
-      thread_yield ();
-  }
+  thread_yield ();
 
   ASSERT (cur->donatee == NULL);
 }
@@ -388,6 +398,7 @@ thread_get_priority (void)
   return thread_current ()->priority;
 }
 
+/* A list elem comparator for threads, greater priority thread comes first. */
 bool
 thread_priority_greater (const struct list_elem *a,
                          const struct list_elem *b,
@@ -401,6 +412,7 @@ thread_priority_greater (const struct list_elem *a,
 /* Max depth of priority donation. */
 #define MAX_DONATION_DEPTH 8
 
+/* Add a edge from parent -> child in the donation tree. */
 void
 thread_donation_add (struct thread *parent, struct thread *child)
 {
@@ -411,7 +423,7 @@ thread_donation_add (struct thread *parent, struct thread *child)
   child->donatee = parent;
   list_push_back (&parent->donater, &child->donater_elem);
   if (parent->priority < child->priority)
-    parent->priority = child->priority;
+    update_priority (parent, child->priority);
   else
     return;
 
@@ -419,18 +431,20 @@ thread_donation_add (struct thread *parent, struct thread *child)
     child = parent;
     parent = parent->donatee;
     if (parent->priority < child->priority)
-      parent->priority = child->priority;
+      update_priority (parent, child->priority);
     else
       return;
   }
 }
 
+/* Remove the edge from parent -> child in the donation tree. */
 void
 thread_donation_remove (struct thread *parent, struct thread *child)
 {
   struct thread *t;
   struct list_elem *e;
 
+  ASSERT (parent->status == THREAD_RUNNING);
   ASSERT (child->donatee == parent);
 
   child->donatee = NULL;
@@ -474,14 +488,18 @@ thread_get_recent_cpu (void)
   return FIX_INT(thread_current ()->recent_cpu * 100);
 }
 
+/* Helper function to update MLFQS data for a single thread. */
 static void mlfqs_update_one (struct thread *t, void *coef_) {
   int64_t coef = *(int64_t *)coef_;
+  int priority;
   t->recent_cpu = FIX_MUL (coef, t->recent_cpu) + FIX (t->nice);
-  t->priority = PRI_MAX - FIX_INT (t->recent_cpu >> 2) - (t->nice << 1);
-  if (t->priority < PRI_MIN)
-    t->priority = PRI_MIN;
+  priority = PRI_MAX - FIX_INT (t->recent_cpu >> 2) - (t->nice << 1);
+  if (priority < PRI_MIN) priority = PRI_MIN;
+  if (priority > PRI_MAX) priority = PRI_MAX;
+  update_priority (t, priority);
 }
 
+/* Update MLFQS data. Called once a tick. */
 void thread_mlfqs_update (void) {
   struct thread *cur = thread_current ();
   int ready_threads;
@@ -610,15 +628,18 @@ static struct thread *
 next_thread_to_run (void) 
 {
   struct list_elem *e;
+  int p;
 
-  if (list_empty (&ready_list))
-    return idle_thread;
-  else {
-    e = list_min (&ready_list, thread_priority_greater, NULL);
-    list_remove (e);
-    ready_list_size--;
-    return list_entry (e, struct thread, elem);
+  if (ready_list_size > 0) {
+    for (p = PRI_MAX; p >= PRI_MIN; --p) {
+      if (!list_empty (&ready_list[p])) {
+        e = list_pop_front (&ready_list[p]);
+        ready_list_size--;
+        return list_entry (e, struct thread, elem);
+      }
+    }
   }
+  return idle_thread;
 }
 
 /* Completes a thread switch by activating the new thread's page
