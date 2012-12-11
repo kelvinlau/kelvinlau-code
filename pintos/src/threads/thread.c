@@ -22,10 +22,11 @@
    of thread.h for details. */
 #define THREAD_MAGIC 0xcd6abf4b
 
-/* List of processes in THREAD_READY state, that is, processes
+/* Lists of processes in THREAD_READY state, that is, processes
    that are ready to run but not actually running. */
 static struct list ready_list[PRI_MAX + 1];
-static int ready_list_size;
+static int ready_list_size;     /* Total number of ready threads. */
+static int hp;                  /* Highest priority of ready threads. */
 
 /* List of all processes.  Processes are added to this list
    when they are first scheduled and removed when they exit. */
@@ -100,6 +101,7 @@ thread_init (void)
   for (p = PRI_MIN; p <= PRI_MAX; ++p)
     list_init (&ready_list[p]);
   ready_list_size = 0;
+  hp = PRI_MIN - 1;
   list_init (&all_list);
 
   /* Set up a thread structure for the running thread. */
@@ -266,6 +268,8 @@ thread_unblock (struct thread *t)
   ASSERT (t->status == THREAD_BLOCKED);
   list_push_back (&ready_list[t->priority], &t->elem);
   ready_list_size++;
+  if (t->priority > hp)
+    hp = t->priority;
   t->status = THREAD_READY;
   intr_set_level (old_level);
 }
@@ -338,6 +342,8 @@ thread_yield (void)
   if (cur != idle_thread) {
     list_push_back (&ready_list[cur->priority], &cur->elem);
     ready_list_size++;
+    if (cur->priority > hp)
+      hp = cur->priority;
   }
   cur->status = THREAD_READY;
   schedule ();
@@ -369,6 +375,8 @@ static void update_priority (struct thread *t, int priority) {
   if (t->status == THREAD_READY && t != idle_thread) {
     list_remove (&t->elem);
     list_push_back (&ready_list[priority], &t->elem);
+    if (priority > hp)
+      hp = priority;
   }
   t->priority = priority;
 }
@@ -628,16 +636,13 @@ static struct thread *
 next_thread_to_run (void) 
 {
   struct list_elem *e;
-  int p;
 
   if (ready_list_size > 0) {
-    for (p = PRI_MAX; p >= PRI_MIN; --p) {
-      if (!list_empty (&ready_list[p])) {
-        e = list_pop_front (&ready_list[p]);
-        ready_list_size--;
-        return list_entry (e, struct thread, elem);
-      }
-    }
+    while (hp >= PRI_MIN && list_empty (&ready_list[hp]))
+      hp--;
+    e = list_pop_front (&ready_list[hp]);
+    ready_list_size--;
+    return list_entry (e, struct thread, elem);
   }
   return idle_thread;
 }
