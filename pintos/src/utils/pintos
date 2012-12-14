@@ -287,7 +287,8 @@ sub find_disks {
     my ($handle);
     if (!defined $make_disk) {
 	($handle, $make_disk) = tempfile (UNLINK => $tmp_disk,
-					  SUFFIX => '.dsk');
+					  SUFFIX => '.dsk',
+					  DIR => '.');
     } else {
 	die "$make_disk: already exists\n" if -e $make_disk;
 	open ($handle, '>', $make_disk) or die "$make_disk: create: $!\n";
@@ -331,7 +332,8 @@ sub prepare_scratch_disk {
     my ($p) = $parts{SCRATCH};
     # Create temporary partition and write the files to put to it,
     # then write an end-of-archive marker.
-    my ($part_handle, $part_fn) = tempfile (UNLINK => 1, SUFFIX => '.part');
+    my ($part_handle, $part_fn) = tempfile (UNLINK => 1, SUFFIX => '.part',
+                                            DIR => '.');
     put_scratch_file ($_->[0], defined $_->[1] ? $_->[1] : $_->[0],
 		      $part_handle, $part_fn)
       foreach @puts;
@@ -619,7 +621,6 @@ sub run_qemu {
     print "warning: qemu doesn't support jitter\n"
       if defined $jitter;
     my (@cmd) = ('qemu');
-#     push (@cmd, '-no-kqemu');
     push (@cmd, '-hda', $disks[0]) if defined $disks[0];
     push (@cmd, '-hdb', $disks[1]) if defined $disks[1];
     push (@cmd, '-hdc', $disks[2]) if defined $disks[2];
@@ -942,3 +943,5 @@ sub find_in_path {
     -x "$_/$program" and return $program foreach split (':', $ENV{PATH});
     return;
 }
+
+# vim: ts=8
