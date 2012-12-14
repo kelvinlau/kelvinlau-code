@@ -4,3 +4,4 @@ cscope.*.out
 TAGS
 tags
 *.o
+*.a
