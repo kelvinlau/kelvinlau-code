@@ -81,4 +81,24 @@ void HumanPlayer::Info(int a, int b) {
   analyst_->Update(guess_, a, b);
 }
 
+// ----------------- SmartPlayer ------------------
+
+SmartPlayer::SmartPlayer() : analyst_(new GameAnalyst) {
+}
+
+SmartPlayer::~SmartPlayer() {
+  delete analyst_;
+}
+
+int SmartPlayer::Think() {
+  const vector<int>& pset = analyst_->PSet();
+  return guess_ = pset[0];
+}
+
+void SmartPlayer::Info(int a, int b) {
+  analyst_->Update(guess_, a, b);
+}
+
+// ----------------- SmartPlayer ------------------
+
 }  // namespace master_mind

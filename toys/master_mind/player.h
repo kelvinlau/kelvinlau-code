@@ -27,6 +27,19 @@ class HumanPlayer : public Player {
   GameAnalyst* analyst_;
 };
 
+class SmartPlayer : public Player {
+ public:
+  SmartPlayer();
+  virtual ~SmartPlayer();
+
+  virtual int Think();
+  virtual void Info(int a, int b);
+
+ private:
+  int guess_;
+  GameAnalyst* analyst_;
+};
+
 }  // namespace master_mind
 
 #endif  // MASTER_MIND_PLAYER_H_
