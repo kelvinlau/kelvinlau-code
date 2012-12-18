@@ -1,10 +1,6 @@
 #ifndef MASTER_MIND_PLAYER_H_
 #define MASTER_MIND_PLAYER_H_
 
-#include <vector>
-
-using std::vector;
-
 namespace master_mind {
 
 class Player {
@@ -16,6 +12,8 @@ class Player {
   virtual void Info(int a, int b) = 0;
 };
 
+class GameAnalyst;
+
 class HumanPlayer : public Player {
  public:
   HumanPlayer();
@@ -26,7 +24,7 @@ class HumanPlayer : public Player {
 
  private:
   int guess_;
-  vector<int> pset_;
+  GameAnalyst* analyst_;
 };
 
 }  // namespace master_mind

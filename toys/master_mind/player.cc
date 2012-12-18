@@ -2,10 +2,13 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <vector>
 
 #include "game.h"
 
 namespace master_mind {
+
+using std::vector;
 
 // ----------------- Player ------------------
 
@@ -13,15 +16,44 @@ Player::Player() {}
 
 Player::~Player() {}
 
+// ----------------- GameAnalyst ------------------
+
+class GameAnalyst {
+ public:
+  GameAnalyst() {
+    for (int x = 0; x < 10000; x++)
+      if (Game::IsStateValid(x))
+        pset_.push_back(x);
+  }
+
+  const vector<int>& PSet() const {
+    return pset_;
+  }
+
+  void Update(int guess, int a, int b) {
+    vector<int> pset;
+    for (int i = 0; i < pset_.size(); ++i) {
+      int a1, b1;
+      Game::Compare(pset_[i], guess, &a1, &b1);
+      if (a1 == a && b1 == b) {
+        pset.push_back(pset_[i]);
+      }
+    }
+    pset_.swap(pset);
+  }
+
+ private:
+  vector<int> pset_;
+};
+
 // ----------------- HumanPlayer ------------------
 
-HumanPlayer::HumanPlayer() {
-  for (int x = 0; x < 10000; x++)
-    if (Game::IsStateValid(x))
-      pset_.push_back(x);
+HumanPlayer::HumanPlayer() : analyst_(new GameAnalyst) {
 }
 
-HumanPlayer::~HumanPlayer() {}
+HumanPlayer::~HumanPlayer() {
+  delete analyst_;
+}
 
 int HumanPlayer::Think() {
   char line[1 << 10];
@@ -32,8 +64,9 @@ int HumanPlayer::Think() {
       break;
     line[strlen(line) - 1] = '\0';  // Strip newline.
     if (strcmp(line, "ls") == 0) {
-      for (int i = 0; i < pset_.size(); ++i)
-        printf("%04d    ", pset_[i]);
+      const vector<int>& pset = analyst_->PSet();
+      for (int i = 0; i < pset.size(); ++i)
+        printf("%04d    ", pset[i]);
       puts("");
     } else {
       sscanf(line, "%d", &guess_);
@@ -45,16 +78,7 @@ int HumanPlayer::Think() {
 
 void HumanPlayer::Info(int a, int b) {
   printf("%d: %dA%dB\n", guess_, a, b);
-
-  vector<int> pset;
-  for (int i = 0; i < pset_.size(); ++i) {
-    int a1, b1;
-    Game::Compare(pset_[i], guess_, &a1, &b1);
-    if (a1 == a && b1 == b) {
-      pset.push_back(pset_[i]);
-    }
-  }
-  pset_.swap(pset);
+  analyst_->Update(guess_, a, b);
 }
 
 }  // namespace master_mind
