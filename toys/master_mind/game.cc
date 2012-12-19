@@ -113,6 +113,13 @@ bool Game::IsStateValid(int state) {
 }
 
 // static.
+void Game::AppendAllStates(vector<int>* pset) {
+  for (int x = 0; x < 10000; x++)
+    if (IsStateValid(x))
+      pset->push_back(x);
+}
+
+// static.
 const int Game::kMaxMoves = 10;
 
 // static.

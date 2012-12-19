@@ -3,13 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <vector>
 
 #include "game.h"
 
 namespace master_mind {
-
-using std::vector;
 
 // ----------------- Player ------------------
 
@@ -22,9 +19,7 @@ Player::~Player() {}
 class GameAnalyst {
  public:
   GameAnalyst() {
-    for (int x = 0; x < 10000; x++)
-      if (Game::IsStateValid(x))
-        pset_.push_back(x);
+    Game::AppendAllStates(&pset_);
   }
 
   const vector<int>& PSet() const {

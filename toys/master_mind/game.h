@@ -1,7 +1,11 @@
 #ifndef MASTER_MIND_GAME_H_
 #define MASTER_MIND_GAME_H_
 
+#include <vector>
+
 namespace master_mind {
+
+using std::vector;
 
 class Player;
 
@@ -19,6 +23,7 @@ class Game {
 
   static bool IsStateValid(int state);
   static int RandomState();
+  static void AppendAllStates(vector<int>* pset);
   static void Compare(int secret, int guess, int* a, int* b);
   static void Init();
 
