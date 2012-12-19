@@ -12,24 +12,26 @@ class Game {
   void Reset();
   void Run();
 
+  void SetVebose(bool vebose);
+
   int Moves() const;
   bool IsEnded() const;
   bool IsWon() const;
 
   static bool IsStateValid(int state);
+  static int RandomState();
   static void Compare(int secret, int guess, int* a, int* b);
   static void Init();
 
- private:
-  static int RandomState();
-
   static const int kMaxMoves;
 
+ private:
   int secret_;
   int moves_;
   bool won_;
   bool wrong_move_;
   Player* player_;
+  bool vebose_;
 };
 
 }  // namespace master_mind

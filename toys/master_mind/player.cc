@@ -1,6 +1,7 @@
 #include "player.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <vector>
 
@@ -77,7 +78,6 @@ int HumanPlayer::Think() {
 }
 
 void HumanPlayer::Info(int a, int b) {
-  printf("%d: %dA%dB\n", guess_, a, b);
   analyst_->Update(guess_, a, b);
 }
 
@@ -99,6 +99,37 @@ void SmartPlayer::Info(int a, int b) {
   analyst_->Update(guess_, a, b);
 }
 
-// ----------------- SmartPlayer ------------------
+// ----------------- GreedyPlayer ------------------
+
+GreedyPlayer::GreedyPlayer() : analyst_(new GameAnalyst) {
+}
+
+GreedyPlayer::~GreedyPlayer() {
+  delete analyst_;
+}
+
+int GreedyPlayer::Think() {
+  const vector<int>& pset = analyst_->PSet();
+  return guess_ = pset[rand() % pset.size()];
+}
+
+void GreedyPlayer::Info(int a, int b) {
+  analyst_->Update(guess_, a, b);
+}
+
+// ----------------- IdiotPlayer ------------------
+
+IdiotPlayer::IdiotPlayer() {
+}
+
+IdiotPlayer::~IdiotPlayer() {
+}
+
+int IdiotPlayer::Think() {
+  return Game::RandomState();
+}
+
+void IdiotPlayer::Info(int a, int b) {
+}
 
 }  // namespace master_mind

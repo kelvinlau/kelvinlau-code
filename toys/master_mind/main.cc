@@ -9,17 +9,8 @@ namespace master_mind {
 
 void Run(Player* player) {
   Game game(player);
-  printf("Game started.\n");
+  game.SetVebose(true);
   game.Run();
-  if (game.IsEnded()) {
-    if (game.IsWon()) {
-      printf("Won! Moves: %d.\n", game.Moves());
-    } else {
-      printf("Lost.\n");
-    }
-  } else {
-    printf("Game is not ended.\n");
-  }
 }
 
 void Benchmark(Player* player, int num_games) {
@@ -43,6 +34,10 @@ int match(const char* str, const char* pat_) {
 Player* GetPlayerByName(const char* name) {
   if (match(name, "smart|s"))
     return new SmartPlayer;
+  if (match(name, "idiot|i"))
+    return new IdiotPlayer;
+  if (match(name, "greedy|g"))
+    return new GreedyPlayer;
   if (match(name, "human|h"))
     return new HumanPlayer;
   return NULL;
