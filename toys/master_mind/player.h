@@ -49,7 +49,11 @@ class SmartPlayer : public Player {
   virtual void Info(int a, int b);
 
  private:
+  double DecisionEntropy(int g);
+  static double Entropy(int a[], int n);
+
   int guess_;
+  int moves_;
   GameAnalyst* analyst_;
 };
 

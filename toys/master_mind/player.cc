@@ -1,8 +1,10 @@
 #include "player.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <algorithm>
 
 #include "game.h"
 
@@ -79,6 +81,7 @@ void HumanPlayer::Info(int a, int b) {
 // ----------------- SmartPlayer ------------------
 
 SmartPlayer::SmartPlayer() : analyst_(new GameAnalyst) {
+  moves_ = 0;
 }
 
 SmartPlayer::~SmartPlayer() {
@@ -86,12 +89,56 @@ SmartPlayer::~SmartPlayer() {
 }
 
 int SmartPlayer::Think() {
+  if (++moves_ <= 2)
+    return guess_ = Game::RandomState();
+
   const vector<int>& pset = analyst_->PSet();
-  return guess_ = pset[0];
+  if (pset.size() == 1)
+    return guess_ = pset[0];
+
+  double emax = -1e100;
+  for (int i = 0; i < pset.size(); ++i) {
+    int g = pset[i];
+    double e = DecisionEntropy(g);
+    if (emax < e) {
+      emax = e;
+      guess_ = g;
+    }
+  }
+  return guess_;
 }
 
 void SmartPlayer::Info(int a, int b) {
   analyst_->Update(guess_, a, b);
+}
+
+double SmartPlayer::DecisionEntropy(int g) {
+  const vector<int>& pset = analyst_->PSet();
+  int a, b, k, p[25];
+  memset(p, 0, sizeof p);
+  for (int j = 0; j < pset.size(); ++j) {
+    int x = pset[j];
+    Game::Compare(x, g, &a, &b);
+    k = a * 5 + b;
+    p[k]++;
+  }
+  return Entropy(p, 25);
+}
+
+// static
+double SmartPlayer::Entropy(int a[], int n) {
+  int s = 0;
+  for (int i = 0; i < n; ++i)
+    s += a[i];
+  double e = 0.0;
+  for (int i = 0; i < n; ++i) {
+    if (a[i] == 0) continue;
+    double p = 1.0 * a[i] / s;
+    e -= p * log(p);
+//    e -= p * p;
+//    e = std::max(e, p);
+  }
+  return e;
 }
 
 // ----------------- GreedyPlayer ------------------
