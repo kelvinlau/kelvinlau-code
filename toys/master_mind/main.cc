@@ -25,12 +25,12 @@ int match(const char* str, const char* pat_) {
 Player* GetPlayerByName(const char* name) {
   if (match(name, "smart|s"))
     return new SmartPlayer;
+  if (match(name, "human|h"))
+    return new HumanPlayer;
   if (match(name, "idiot|i"))
     return new IdiotPlayer;
   if (match(name, "greedy|g"))
     return new GreedyPlayer;
-  if (match(name, "human|h"))
-    return new HumanPlayer;
   return NULL;
 }
 
@@ -66,8 +66,10 @@ int Main(int argc, char** argv) {
            "       %s run|r <player>\n"
            "\n"
            "<player>:\n"
-           "  human|h: Human player;\n"
            "  smart|s: Smart player (default);\n"
+           "  human|h: Human player;\n"
+           "  idiot|i: Idiot player;\n"
+           "  greedy|g: Greedy player;\n"
            "\n"
            "<num-games>: Number of games to test. (default 100)\n",
            argv[0], argv[0]);
