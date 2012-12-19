@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -11,10 +12,6 @@ namespace master_mind {
 Game::Game(Player* player) :
   player_(player),
   vebose_(false) {
-  Reset();
-}
-
-void Game::Reset() {
   secret_ = RandomState();
   moves_ = 0;
   wrong_move_ = false;
@@ -22,28 +19,36 @@ void Game::Reset() {
 }
 
 void Game::Run() {
-  printf("Game started.\n");
+  Msg("Game started.\n");
   while (moves_ < kMaxMoves) {
     int guess = player_->Think();
     int a, b;
     if (!IsStateValid(guess)) {
       wrong_move_ = true;
-      printf("Wrong move.\n");
+      Msg("Wrong move.\n");
       return;
     }
     moves_++;
     Compare(secret_, guess, &a, &b);
-    if (vebose_) {
-      printf("%04d: %dA%dB\n", guess, a, b);
-    }
+    Msg("%04d: %dA%dB\n", guess, a, b);
     player_->Info(a, b);
     if (guess == secret_) {
       won_ = true;
-      printf("Won! Moves: %d.\n", moves_);
+      Msg("Won! Moves: %d.\n", moves_);
       return;
     }
   }
-  printf("Lost.\n");
+  Msg("Lost.\n");
+}
+
+void Game::Msg(const char* format, ...) {
+  if (!vebose_)
+    return;
+
+  va_list args;
+  va_start(args, format);
+  vprintf(format, args);
+  va_end(args);
 }
 
 void Game::SetVebose(bool vebose) {

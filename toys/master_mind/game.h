@@ -9,7 +9,6 @@ class Game {
  public:
   Game(Player* player);
 
-  void Reset();
   void Run();
 
   void SetVebose(bool vebose);
@@ -26,6 +25,8 @@ class Game {
   static const int kMaxMoves;
 
  private:
+  void Msg(const char* format, ...);
+
   int secret_;
   int moves_;
   bool won_;

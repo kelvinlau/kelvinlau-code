@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,16 +7,6 @@
 #include "player.h"
 
 namespace master_mind {
-
-void Run(Player* player) {
-  Game game(player);
-  game.SetVebose(true);
-  game.Run();
-}
-
-void Benchmark(Player* player, int num_games) {
-  printf("NOT IMPLEMENTED.\n");
-}
 
 int match(const char* str, const char* pat_) {
   char* pat = strdup(pat_);
@@ -41,6 +32,32 @@ Player* GetPlayerByName(const char* name) {
   if (match(name, "human|h"))
     return new HumanPlayer;
   return NULL;
+}
+
+void Run(const char* player_name) {
+  Player* player = GetPlayerByName(player_name);
+  Game game(player);
+  game.SetVebose(true);
+  game.Run();
+}
+
+void Benchmark(const char* player_name, int num_games) {
+  int won = 0, lost = 0, sum_moves = 0;
+  for (int i = 0; i < num_games; ++i) {
+    Player* player = GetPlayerByName(player_name);
+    Game game(player);
+    game.SetVebose(false);
+    game.Run();
+    assert(game.IsEnded());
+    if (game.IsWon()) {
+      won++;
+      sum_moves += game.Moves();
+    } else {
+      lost++;
+    }
+  }
+  printf("Won: %d/%d, Averge moves: %lf.\n",
+         won, num_games, 1.0 * sum_moves / won);
 }
 
 int Main(int argc, char** argv) {
@@ -73,6 +90,7 @@ int Main(int argc, char** argv) {
     printf("No such player: %s\n", player_name);
     return 1;
   }
+  delete player;
 
   Game::Init();
 
@@ -80,13 +98,12 @@ int Main(int argc, char** argv) {
     int num_games = 100;
     if (argc > 3)
       sscanf(argv[3], "%d", &num_games);
-    Benchmark(player, num_games);
+    Benchmark(player_name, num_games);
 
   } else if (op == 1) {
-    Run(player);
+    Run(player_name);
   }
 
-  delete player;
   return 0;
 }
 
