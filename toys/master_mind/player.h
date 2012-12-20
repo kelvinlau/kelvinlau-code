@@ -85,7 +85,7 @@ class SmartPlayer : public Player {
   void FreeTree(DecisionTree*);
 
   double DecisionScore(const GameAnalyst& analyst, int g);
-  virtual double Score(int a[], int n);
+  virtual double Score(int a[], int n) = 0;
 
   DecisionTree* root_;
   DecisionTree* node_;
@@ -95,6 +95,15 @@ class SquarePlayer : public SmartPlayer {
  public:
   SquarePlayer();
   virtual ~SquarePlayer();
+
+ private:
+  double Score(int a[], int n);
+};
+
+class EntropyPlayer : public SmartPlayer {
+ public:
+  EntropyPlayer();
+  virtual ~EntropyPlayer();
 
  private:
   double Score(int a[], int n);

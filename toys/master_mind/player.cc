@@ -163,19 +163,6 @@ double SmartPlayer::DecisionScore(const GameAnalyst& analyst, int g) {
   return Score(p, 25);
 }
 
-double SmartPlayer::Score(int a[], int n) {
-  int sum = 0;
-  for (int i = 0; i < n; ++i)
-    sum += a[i];
-  double s = 0.0;
-  for (int i = 0; i < n; ++i) {
-    if (a[i] == 0) continue;
-    double p = 1.0 * a[i] / sum;
-    s -= p * log(p);
-  }
-  return s;
-}
-
 void SmartPlayer::Prepare() {
   node_ = root_;
 }
@@ -195,7 +182,6 @@ void SmartPlayer::Leave() {
 // ----------------- SquarePlayer ------------------
 
 SquarePlayer::SquarePlayer() {
-  puts("SquarePlayer ctor");
 }
 
 SquarePlayer::~SquarePlayer() {
@@ -210,6 +196,27 @@ double SquarePlayer::Score(int a[], int n) {
     if (a[i] == 0) continue;
     double p = 1.0 * a[i] / sum;
     s -= p * p;
+  }
+  return s;
+}
+
+// ----------------- EntropyPlayer ------------------
+
+EntropyPlayer::EntropyPlayer() {
+}
+
+EntropyPlayer::~EntropyPlayer() {
+}
+
+double EntropyPlayer::Score(int a[], int n) {
+  int sum = 0;
+  for (int i = 0; i < n; ++i)
+    sum += a[i];
+  double s = 0.0;
+  for (int i = 0; i < n; ++i) {
+    if (a[i] == 0) continue;
+    double p = 1.0 * a[i] / sum;
+    s -= p * log(p);
   }
   return s;
 }

@@ -23,8 +23,8 @@ int match(const char* str, const char* pat_) {
 }
 
 Player* GetPlayerByName(const char* name) {
-  if (match(name, "smart|s")) {
-    SmartPlayer* player = new SmartPlayer;
+  if (match(name, "entropy|e")) {
+    EntropyPlayer* player = new EntropyPlayer;
     player->Init();
     return player;
   }
@@ -86,7 +86,7 @@ int Main(int argc, char** argv) {
            "       %s run|r <player> <num-games>\n"
            "\n"
            "<player>:\n"
-           "  smart|s: Smart player (default);\n"
+           "  entropy|e: Smart player using entropy scoring function;\n"
            "  square|sq: Smart player using square scoring function;\n"
            "  human|h: Human player;\n"
            "  idiot|i: Idiot player;\n"
@@ -107,7 +107,7 @@ int Main(int argc, char** argv) {
     return 1;
   }
 
-  const char* player_name = argc > 2 ? argv[2] : "s";
+  const char* player_name = argc > 2 ? argv[2] : "";
   Player* player = GetPlayerByName(player_name);
   if (player == NULL) {
     printf("No such player: %s\n", player_name);
