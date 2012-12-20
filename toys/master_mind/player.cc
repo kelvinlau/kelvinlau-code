@@ -180,6 +180,8 @@ double SmartPlayer::Entropy(int a[], int n) {
     if (a[i] == 0) continue;
     double p = 1.0 * a[i] / s;
     e -= p * log(p);
+//    e -= p * p;
+//    e = std::min(e, -p);
   }
   return e;
 }

@@ -15,6 +15,7 @@ class Game {
 
   void Run();
 
+  void SetSecret(int secret);
   void SetVebose(bool vebose);
 
   int Moves() const;

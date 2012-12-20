@@ -34,36 +34,50 @@ Player* GetPlayerByName(const char* name) {
   return NULL;
 }
 
-void Run(const char* player_name) {
-  Player* player = GetPlayerByName(player_name);
-  Game game(player);
-  game.SetVebose(true);
-  game.Run();
-}
-
-void Benchmark(const char* player_name, int num_games) {
-  int won = 0, lost = 0, sum_moves = 0;
+void Run(const char* player_name, int num_games) {
+  int won = 0, sum = 0, max = 0;
   for (int i = 0; i < num_games; ++i) {
     Player* player = GetPlayerByName(player_name);
     Game game(player);
+    game.SetVebose(num_games == 1);
+    game.Run();
+    assert(game.IsEnded());
+    if (game.IsWon()) {
+      won++;
+      sum += game.Moves();
+      max = std::max(max, game.Moves());
+    }
+  }
+  if (num_games > 1)
+    printf("Won: %d/%d, Averge: %lf, Max: %d.\n",
+           won, num_games, 1.0 * sum / won, max);
+}
+
+void Benchmark(const char* player_name) {
+  int won = 0, sum = 0, max = 0;
+  vector<int> all;
+  Game::AppendAllStates(&all);
+  for (int i = 0; i < all.size(); ++i) {
+    Player* player = GetPlayerByName(player_name);
+    Game game(player);
+    game.SetSecret(all[i]);
     game.SetVebose(false);
     game.Run();
     assert(game.IsEnded());
     if (game.IsWon()) {
       won++;
-      sum_moves += game.Moves();
-    } else {
-      lost++;
+      sum += game.Moves();
+      max = std::max(max, game.Moves());
     }
   }
-  printf("Won: %d/%d, Averge moves: %lf.\n",
-         won, num_games, 1.0 * sum_moves / won);
+  printf("Won: %d/%zd, Averge: %lf, Max: %d.\n",
+         won, all.size(), 1.0 * sum / won, max);
 }
 
 int Main(int argc, char** argv) {
   if (argc == 1) {
-    printf("Usage: %s benchmark|b <player> <num-games>\n"
-           "       %s run|r <player>\n"
+    printf("Usage: %s benchmark|b <player>\n"
+           "       %s run|r <player> <num-games>\n"
            "\n"
            "<player>:\n"
            "  smart|s: Smart player (default);\n"
@@ -71,7 +85,7 @@ int Main(int argc, char** argv) {
            "  idiot|i: Idiot player;\n"
            "  greedy|g: Greedy player;\n"
            "\n"
-           "<num-games>: Number of games to test. (default 100)\n",
+           "<num-games>: Number of games to test. (default 1)\n",
            argv[0], argv[0]);
     return 1;
   }
@@ -97,13 +111,13 @@ int Main(int argc, char** argv) {
   Game::Init();
 
   if (op == 0) {
-    int num_games = 100;
-    if (argc > 3)
-      sscanf(argv[3], "%d", &num_games);
-    Benchmark(player_name, num_games);
+    Benchmark(player_name);
 
   } else if (op == 1) {
-    Run(player_name);
+    int num_games = 1;
+    if (argc > 3)
+      sscanf(argv[3], "%d", &num_games);
+    Run(player_name, num_games);
   }
 
   return 0;

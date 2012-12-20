@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,6 +50,11 @@ void Game::Msg(const char* format, ...) {
   va_start(args, format);
   vprintf(format, args);
   va_end(args);
+}
+
+void Game::SetSecret(int secret) {
+  assert(IsStateValid(secret));
+  secret_ = secret;
 }
 
 void Game::SetVebose(bool vebose) {
