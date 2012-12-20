@@ -80,40 +80,85 @@ void HumanPlayer::Info(int a, int b) {
 
 // ----------------- SmartPlayer ------------------
 
-SmartPlayer::SmartPlayer() : analyst_(new GameAnalyst) {
-  moves_ = 0;
+SmartPlayer::SmartPlayer() {
+  Build();
+  node_ = root;
 }
 
 SmartPlayer::~SmartPlayer() {
-  delete analyst_;
 }
 
-int SmartPlayer::Think() {
-  if (++moves_ <= 2)
-    return guess_ = Game::RandomState();
+// static.
+// Build decision tree.
+void SmartPlayer::Build() {
+  if (root) return;
+  GameAnalyst analyst;
+  root = BuildTree(analyst, 1);
+  atexit(Free);  // Free decision tree when program exits.
+}
 
-  const vector<int>& pset = analyst_->PSet();
-  if (pset.size() == 1)
-    return guess_ = pset[0];
+// static.
+// Internal implementation of Build().
+SmartPlayer::DecisionTree* SmartPlayer::BuildTree(const GameAnalyst& analyst,
+                                                  int depth) {
+  const vector<int>& pset = analyst.PSet();
+  if (pset.empty()) return NULL;
 
-  double emax = -1e100;
-  for (int i = 0; i < pset.size(); ++i) {
-    int g = pset[i];
-    double e = DecisionEntropy(g);
-    if (emax < e) {
-      emax = e;
-      guess_ = g;
+  DecisionTree* node = new DecisionTree;
+
+  if (depth == 1) {
+    node->guess = 1234;  // Fixed number at first guess.
+  } else {
+    double emax = -1e100;
+    for (int i = 0; i < pset.size(); ++i) {
+      int g = pset[i];
+      double e = DecisionEntropy(analyst, g);
+      if (emax < e) {
+        emax = e;
+        node->guess = g;
+      }
     }
   }
-  return guess_;
+  for (int a = 0; a <= 4; a++) {
+    for (int b = 0; a + b <= 4; b++) {
+      int k = a * 5 + b;
+      if (a == 4 && b == 0) {
+        node->child[k] = NULL;
+        continue;
+      }
+      GameAnalyst analyst1 = analyst;  // Make a copy.
+      analyst1.Update(node->guess, a, b);
+      node->child[k] = BuildTree(analyst1, depth + 1);
+    }
+  }
+  return node;
 }
 
-void SmartPlayer::Info(int a, int b) {
-  analyst_->Update(guess_, a, b);
+// static.
+// Free decision tree.
+void SmartPlayer::Free() {
+  FreeTree(root);
 }
 
-double SmartPlayer::DecisionEntropy(int g) {
-  const vector<int>& pset = analyst_->PSet();
+// static.
+// Internal implementation of Free().
+void SmartPlayer::FreeTree(DecisionTree* node) {
+  if (!node)
+    return;
+  for (int a = 0; a <= 4; a++) {
+    for (int b = 0; a + b <= 4; b++) {
+      int k = a * 5 + b;
+      FreeTree(node->child[k]);
+    }
+  }
+  delete node;
+}
+
+SmartPlayer::DecisionTree* SmartPlayer::root = NULL;
+
+// static.
+double SmartPlayer::DecisionEntropy(const GameAnalyst& analyst, int g) {
+  const vector<int>& pset = analyst.PSet();
   int a, b, k, p[25];
   memset(p, 0, sizeof p);
   for (int j = 0; j < pset.size(); ++j) {
@@ -125,7 +170,7 @@ double SmartPlayer::DecisionEntropy(int g) {
   return Entropy(p, 25);
 }
 
-// static
+// static.
 double SmartPlayer::Entropy(int a[], int n) {
   int s = 0;
   for (int i = 0; i < n; ++i)
@@ -135,10 +180,17 @@ double SmartPlayer::Entropy(int a[], int n) {
     if (a[i] == 0) continue;
     double p = 1.0 * a[i] / s;
     e -= p * log(p);
-//    e -= p * p;
-//    e = std::max(e, p);
   }
   return e;
+}
+
+int SmartPlayer::Think() {
+  return node_->guess;
+}
+
+void SmartPlayer::Info(int a, int b) {
+  int k = a * 5 + b;
+  node_ = node_->child[k];
 }
 
 // ----------------- GreedyPlayer ------------------

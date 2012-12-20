@@ -9,7 +9,7 @@ class Player {
   virtual ~Player();
 
   virtual int Think() = 0;
-  virtual void Info(int a, int b) = 0;
+  virtual void Info(int a, int b) = 0;  // TODO: add guess.
 };
 
 class GameAnalyst;
@@ -49,12 +49,22 @@ class SmartPlayer : public Player {
   virtual void Info(int a, int b);
 
  private:
-  double DecisionEntropy(int g);
+  struct DecisionTree {
+    int guess;
+    DecisionTree* child[5 * 5];
+  };
+
+  static DecisionTree* root;
+
+  static void Build();
+  static DecisionTree* BuildTree(const GameAnalyst& analyst, int depth);
+  static void Free();
+  static void FreeTree(DecisionTree*);
+
+  static double DecisionEntropy(const GameAnalyst& analyst, int g);
   static double Entropy(int a[], int n);
 
-  int guess_;
-  int moves_;
-  GameAnalyst* analyst_;
+  DecisionTree* node_;
 };
 
 class IdiotPlayer : public Player {
