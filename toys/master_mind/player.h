@@ -3,14 +3,32 @@
 
 namespace master_mind {
 
+/* This is the player interface.
+ * Typical call sequence for a single game:
+ *   Prepare()
+ *   Think()
+ *   Info()
+ *   Think()
+ *   Info()
+ *   ...
+ *   Leave()
+ */
 class Player {
  public:
   Player();
   virtual ~Player();
 
+  // Called before each game.
+  virtual void Prepare() = 0;
+
+  // Called next move.
   virtual int Think() = 0;
+
+  // Called to info the result to the previous move.
   virtual void Info(int guess, int a, int b) = 0;
-  virtual void Reset() = 0;
+
+  // Called after each game.
+  virtual void Leave() = 0;
 };
 
 class GameAnalyst;
@@ -20,9 +38,10 @@ class HumanPlayer : public Player {
   HumanPlayer();
   virtual ~HumanPlayer();
 
+  virtual void Prepare();
   virtual int Think();
   virtual void Info(int guess, int a, int b);
-  virtual void Reset();
+  virtual void Leave();
 
  private:
   GameAnalyst* analyst_;
@@ -33,9 +52,10 @@ class GreedyPlayer : public Player {
   GreedyPlayer();
   virtual ~GreedyPlayer();
 
+  virtual void Prepare();
   virtual int Think();
   virtual void Info(int guess, int a, int b);
-  virtual void Reset();
+  virtual void Leave();
 
  private:
   GameAnalyst* analyst_;
@@ -46,9 +66,10 @@ class SmartPlayer : public Player {
   SmartPlayer();
   virtual ~SmartPlayer();
 
+  virtual void Prepare();
   virtual int Think();
   virtual void Info(int guess, int a, int b);
-  virtual void Reset();
+  virtual void Leave();
 
  private:
   struct DecisionTree {
@@ -73,9 +94,10 @@ class IdiotPlayer : public Player {
   IdiotPlayer();
   virtual ~IdiotPlayer();
 
+  virtual void Prepare();
   virtual int Think();
   virtual void Info(int guess, int a, int b);
-  virtual void Reset();
+  virtual void Leave();
 };
 
 }  // namespace master_mind

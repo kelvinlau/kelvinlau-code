@@ -37,7 +37,6 @@ Player* GetPlayerByName(const char* name) {
 void Run(Player* player, int num_games) {
   int won = 0, sum = 0, max = 0;
   for (int i = 0; i < num_games; ++i) {
-    player->Reset();
     Game game(player);
     game.SetVebose(num_games == 1);
     game.Run();
@@ -58,7 +57,6 @@ void Benchmark(Player* player) {
   vector<int> all;
   Game::AppendAllStates(&all);
   for (int i = 0; i < all.size(); ++i) {
-    player->Reset();
     Game game(player);
     game.SetSecret(all[i]);
     game.SetVebose(false);

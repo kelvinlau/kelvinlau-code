@@ -46,11 +46,15 @@ class GameAnalyst {
 
 // ----------------- HumanPlayer ------------------
 
-HumanPlayer::HumanPlayer() : analyst_(new GameAnalyst) {
+HumanPlayer::HumanPlayer() {
 }
 
 HumanPlayer::~HumanPlayer() {
   delete analyst_;
+}
+
+void HumanPlayer::Prepare() {
+  analyst_ = new GameAnalyst;
 }
 
 int HumanPlayer::Think() {
@@ -78,9 +82,8 @@ void HumanPlayer::Info(int guess, int a, int b) {
   analyst_->Update(guess, a, b);
 }
 
-void HumanPlayer::Reset() {
+void HumanPlayer::Leave() {
   delete analyst_;
-  analyst_ = new GameAnalyst;
 }
 
 // ----------------- SmartPlayer ------------------
@@ -172,6 +175,10 @@ double SmartPlayer::Entropy(int a[], int n) {
   return e;
 }
 
+void SmartPlayer::Prepare() {
+  node_ = root_;
+}
+
 int SmartPlayer::Think() {
   return node_->guess;
 }
@@ -181,17 +188,19 @@ void SmartPlayer::Info(int guess, int a, int b) {
   node_ = node_->child[k];
 }
 
-void SmartPlayer::Reset() {
-  node_ = root_;
+void SmartPlayer::Leave() {
 }
 
 // ----------------- GreedyPlayer ------------------
 
-GreedyPlayer::GreedyPlayer() : analyst_(new GameAnalyst) {
+GreedyPlayer::GreedyPlayer() {
 }
 
 GreedyPlayer::~GreedyPlayer() {
-  delete analyst_;
+}
+
+void GreedyPlayer::Prepare() {
+  analyst_ = new GameAnalyst;
 }
 
 int GreedyPlayer::Think() {
@@ -203,9 +212,8 @@ void GreedyPlayer::Info(int guess, int a, int b) {
   analyst_->Update(guess, a, b);
 }
 
-void GreedyPlayer::Reset() {
+void GreedyPlayer::Leave() {
   delete analyst_;
-  analyst_ = new GameAnalyst;
 }
 
 // ----------------- IdiotPlayer ------------------
@@ -216,6 +224,9 @@ IdiotPlayer::IdiotPlayer() {
 IdiotPlayer::~IdiotPlayer() {
 }
 
+void IdiotPlayer::Prepare() {
+}
+
 int IdiotPlayer::Think() {
   return Game::RandomState();
 }
@@ -223,7 +234,7 @@ int IdiotPlayer::Think() {
 void IdiotPlayer::Info(int guess, int a, int b) {
 }
 
-void IdiotPlayer::Reset() {
+void IdiotPlayer::Leave() {
 }
 
 }  // namespace master_mind

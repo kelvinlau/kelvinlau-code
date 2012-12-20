@@ -21,13 +21,14 @@ Game::Game(Player* player) :
 
 void Game::Run() {
   Msg("Game started.\n");
+  player_->Prepare();
   while (moves_ < kMaxMoves) {
     int guess = player_->Think();
     int a, b;
     if (!IsStateValid(guess)) {
       wrong_move_ = true;
       Msg("Wrong move.\n");
-      return;
+      break;
     }
     moves_++;
     Compare(secret_, guess, &a, &b);
@@ -36,10 +37,12 @@ void Game::Run() {
     if (guess == secret_) {
       won_ = true;
       Msg("Won! Moves: %d.\n", moves_);
-      return;
+      break;
     }
   }
-  Msg("Lost.\n");
+  if (!won_ && !wrong_move_)
+    Msg("Lost.\n");
+  player_->Leave();
 }
 
 void Game::Msg(const char* format, ...) {
