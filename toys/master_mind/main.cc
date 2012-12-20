@@ -38,12 +38,15 @@ Player* GetPlayerByName(const char* name) {
     player->Init();
     return player;
   }
+  if (match(name, "greedy|g")) {
+    GreedyPlayer* player = new GreedyPlayer;
+    player->Init();
+    return player;
+  }
   if (match(name, "human|h"))
     return new HumanPlayer;
   if (match(name, "idiot|i"))
     return new IdiotPlayer;
-  if (match(name, "greedy|g"))
-    return new GreedyPlayer;
   return NULL;
 }
 
@@ -93,9 +96,10 @@ int Main(int argc, char** argv) {
            "<player>:\n"
            "  entropy|e: Smart player using entropy scoring function;\n"
            "  square|sq: Smart player using square scoring function;\n"
+           "  minmax|mm: Smart player using min-max scoring function;\n"
+           "  greedy|g: Smart player using random scoring function;\n"
            "  human|h: Human player;\n"
            "  idiot|i: Idiot player;\n"
-           "  greedy|g: Greedy player;\n"
            "\n"
            "<num-games>: Number of games to test. (default 1)\n",
            argv[0], argv[0]);

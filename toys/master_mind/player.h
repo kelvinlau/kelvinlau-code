@@ -47,20 +47,6 @@ class HumanPlayer : public Player {
   GameAnalyst* analyst_;
 };
 
-class GreedyPlayer : public Player {
- public:
-  GreedyPlayer();
-  virtual ~GreedyPlayer();
-
-  virtual void Prepare();
-  virtual int Think();
-  virtual void Info(int guess, int a, int b);
-  virtual void Leave();
-
- private:
-  GameAnalyst* analyst_;
-};
-
 class SmartPlayer : public Player {
  public:
   SmartPlayer();
@@ -113,6 +99,15 @@ class MinMaxPlayer : public SmartPlayer {
  public:
   MinMaxPlayer();
   virtual ~MinMaxPlayer();
+
+ private:
+  double Score(int a[], int n);
+};
+
+class GreedyPlayer : public SmartPlayer {
+ public:
+  GreedyPlayer();
+  virtual ~GreedyPlayer();
 
  private:
   double Score(int a[], int n);

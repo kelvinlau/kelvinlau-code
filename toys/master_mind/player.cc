@@ -250,21 +250,9 @@ GreedyPlayer::GreedyPlayer() {
 GreedyPlayer::~GreedyPlayer() {
 }
 
-void GreedyPlayer::Prepare() {
-  analyst_ = new GameAnalyst;
-}
-
-int GreedyPlayer::Think() {
-  const vector<int>& pset = analyst_->PSet();
-  return pset[rand() % pset.size()];
-}
-
-void GreedyPlayer::Info(int guess, int a, int b) {
-  analyst_->Update(guess, a, b);
-}
-
-void GreedyPlayer::Leave() {
-  delete analyst_;
+// Return a random score so that it will guess random element in pset.
+double GreedyPlayer::Score(int a[], int n) {
+  return rand() * 1.0;
 }
 
 // ----------------- IdiotPlayer ------------------
