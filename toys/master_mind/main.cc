@@ -33,6 +33,11 @@ Player* GetPlayerByName(const char* name) {
     player->Init();
     return player;
   }
+  if (match(name, "minmax|mm")) {
+    MinMaxPlayer* player = new MinMaxPlayer;
+    player->Init();
+    return player;
+  }
   if (match(name, "human|h"))
     return new HumanPlayer;
   if (match(name, "idiot|i"))

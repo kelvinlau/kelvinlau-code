@@ -109,6 +109,15 @@ class EntropyPlayer : public SmartPlayer {
   double Score(int a[], int n);
 };
 
+class MinMaxPlayer : public SmartPlayer {
+ public:
+  MinMaxPlayer();
+  virtual ~MinMaxPlayer();
+
+ private:
+  double Score(int a[], int n);
+};
+
 class IdiotPlayer : public Player {
  public:
   IdiotPlayer();

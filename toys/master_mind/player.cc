@@ -221,6 +221,27 @@ double EntropyPlayer::Score(int a[], int n) {
   return s;
 }
 
+// ----------------- MinMaxPlayer ------------------
+
+MinMaxPlayer::MinMaxPlayer() {
+}
+
+MinMaxPlayer::~MinMaxPlayer() {
+}
+
+double MinMaxPlayer::Score(int a[], int n) {
+  int sum = 0;
+  for (int i = 0; i < n; ++i)
+    sum += a[i];
+  double s = 0.0;
+  for (int i = 0; i < n; ++i) {
+    if (a[i] == 0) continue;
+    double p = 1.0 * a[i] / sum;
+    s = std::min(s, -p);
+  }
+  return s;
+}
+
 // ----------------- GreedyPlayer ------------------
 
 GreedyPlayer::GreedyPlayer() {
