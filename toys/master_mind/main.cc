@@ -90,8 +90,8 @@ void Benchmark(Player* player) {
 
 int Main(int argc, char** argv) {
   if (argc == 1) {
-    printf("Usage: %s benchmark|b <player>\n"
-           "       %s run|r <player> <num-games>\n"
+    printf("Usage: %s benchmark|bm <player>\n"
+           "       %s run <player> <num-games>\n"
            "\n"
            "<player>:\n"
            "  entropy|e: Smart player using entropy scoring function;\n"
@@ -101,15 +101,15 @@ int Main(int argc, char** argv) {
            "  human|h: Human player;\n"
            "  idiot|i: Idiot player;\n"
            "\n"
-           "<num-games>: Number of games to test. (default 1)\n",
+           "<num-games>: Number of games to run. (default 1)\n",
            argv[0], argv[0]);
     return 1;
   }
 
   int op;
-  if (match(argv[1], "benchmark|b")) {
+  if (match(argv[1], "benchmark|bm")) {
     op = 0;
-  } else if (match(argv[1], "run|r")) {
+  } else if (match(argv[1], "run")) {
     op = 1;
   } else {
     printf("Wrong operator: %s\n", argv[1]);
