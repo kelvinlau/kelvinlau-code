@@ -34,10 +34,10 @@ Player* GetPlayerByName(const char* name) {
   return NULL;
 }
 
-void Run(const char* player_name, int num_games) {
+void Run(Player* player, int num_games) {
   int won = 0, sum = 0, max = 0;
   for (int i = 0; i < num_games; ++i) {
-    Player* player = GetPlayerByName(player_name);
+    player->Reset();
     Game game(player);
     game.SetVebose(num_games == 1);
     game.Run();
@@ -53,12 +53,12 @@ void Run(const char* player_name, int num_games) {
            won, num_games, 1.0 * sum / won, max);
 }
 
-void Benchmark(const char* player_name) {
+void Benchmark(Player* player) {
   int won = 0, sum = 0, max = 0;
   vector<int> all;
   Game::AppendAllStates(&all);
   for (int i = 0; i < all.size(); ++i) {
-    Player* player = GetPlayerByName(player_name);
+    player->Reset();
     Game game(player);
     game.SetSecret(all[i]);
     game.SetVebose(false);
@@ -106,19 +106,20 @@ int Main(int argc, char** argv) {
     printf("No such player: %s\n", player_name);
     return 1;
   }
-  delete player;
 
   Game::Init();
 
   if (op == 0) {
-    Benchmark(player_name);
+    Benchmark(player);
 
   } else if (op == 1) {
     int num_games = 1;
     if (argc > 3)
       sscanf(argv[3], "%d", &num_games);
-    Run(player_name, num_games);
+    Run(player, num_games);
   }
+
+  delete player;
 
   return 0;
 }

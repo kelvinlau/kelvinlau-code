@@ -10,6 +10,7 @@ class Player {
 
   virtual int Think() = 0;
   virtual void Info(int guess, int a, int b) = 0;
+  virtual void Reset() = 0;
 };
 
 class GameAnalyst;
@@ -21,6 +22,7 @@ class HumanPlayer : public Player {
 
   virtual int Think();
   virtual void Info(int guess, int a, int b);
+  virtual void Reset();
 
  private:
   GameAnalyst* analyst_;
@@ -33,6 +35,7 @@ class GreedyPlayer : public Player {
 
   virtual int Think();
   virtual void Info(int guess, int a, int b);
+  virtual void Reset();
 
  private:
   GameAnalyst* analyst_;
@@ -45,6 +48,7 @@ class SmartPlayer : public Player {
 
   virtual int Think();
   virtual void Info(int guess, int a, int b);
+  virtual void Reset();
 
  private:
   struct DecisionTree {
@@ -52,16 +56,15 @@ class SmartPlayer : public Player {
     DecisionTree* child[5 * 5];
   };
 
-  static DecisionTree* root;
+  void Build();
+  DecisionTree* BuildTree(const GameAnalyst& analyst, int depth);
+  void Free();
+  void FreeTree(DecisionTree*);
 
-  static void Build();
-  static DecisionTree* BuildTree(const GameAnalyst& analyst, int depth);
-  static void Free();
-  static void FreeTree(DecisionTree*);
+  double DecisionEntropy(const GameAnalyst& analyst, int g);
+  double Entropy(int a[], int n);
 
-  static double DecisionEntropy(const GameAnalyst& analyst, int g);
-  static double Entropy(int a[], int n);
-
+  DecisionTree* root_;
   DecisionTree* node_;
 };
 
@@ -72,8 +75,7 @@ class IdiotPlayer : public Player {
 
   virtual int Think();
   virtual void Info(int guess, int a, int b);
-
- private:
+  virtual void Reset();
 };
 
 }  // namespace master_mind

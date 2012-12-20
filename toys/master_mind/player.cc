@@ -78,27 +78,24 @@ void HumanPlayer::Info(int guess, int a, int b) {
   analyst_->Update(guess, a, b);
 }
 
+void HumanPlayer::Reset() {
+  delete analyst_;
+  analyst_ = new GameAnalyst;
+}
+
 // ----------------- SmartPlayer ------------------
 
 SmartPlayer::SmartPlayer() {
-  Build();
-  node_ = root;
+  GameAnalyst analyst;
+  root_ = BuildTree(analyst, 1);
+  node_ = root_;
 }
 
 SmartPlayer::~SmartPlayer() {
+  FreeTree(root_);
 }
 
-// static.
-// Build decision tree.
-void SmartPlayer::Build() {
-  if (root) return;
-  GameAnalyst analyst;
-  root = BuildTree(analyst, 1);
-  atexit(Free);  // Free decision tree when program exits.
-}
-
-// static.
-// Internal implementation of Build().
+// Build a decision tree.
 SmartPlayer::DecisionTree* SmartPlayer::BuildTree(const GameAnalyst& analyst,
                                                   int depth) {
   const vector<int>& pset = analyst.PSet();
@@ -134,14 +131,7 @@ SmartPlayer::DecisionTree* SmartPlayer::BuildTree(const GameAnalyst& analyst,
   return node;
 }
 
-// static.
-// Free decision tree.
-void SmartPlayer::Free() {
-  FreeTree(root);
-}
-
-// static.
-// Internal implementation of Free().
+// Free a decision tree.
 void SmartPlayer::FreeTree(DecisionTree* node) {
   if (!node)
     return;
@@ -154,9 +144,6 @@ void SmartPlayer::FreeTree(DecisionTree* node) {
   delete node;
 }
 
-SmartPlayer::DecisionTree* SmartPlayer::root = NULL;
-
-// static.
 double SmartPlayer::DecisionEntropy(const GameAnalyst& analyst, int g) {
   const vector<int>& pset = analyst.PSet();
   int a, b, k, p[25];
@@ -170,7 +157,6 @@ double SmartPlayer::DecisionEntropy(const GameAnalyst& analyst, int g) {
   return Entropy(p, 25);
 }
 
-// static.
 double SmartPlayer::Entropy(int a[], int n) {
   int s = 0;
   for (int i = 0; i < n; ++i)
@@ -195,6 +181,10 @@ void SmartPlayer::Info(int guess, int a, int b) {
   node_ = node_->child[k];
 }
 
+void SmartPlayer::Reset() {
+  node_ = root_;
+}
+
 // ----------------- GreedyPlayer ------------------
 
 GreedyPlayer::GreedyPlayer() : analyst_(new GameAnalyst) {
@@ -213,6 +203,11 @@ void GreedyPlayer::Info(int guess, int a, int b) {
   analyst_->Update(guess, a, b);
 }
 
+void GreedyPlayer::Reset() {
+  delete analyst_;
+  analyst_ = new GameAnalyst;
+}
+
 // ----------------- IdiotPlayer ------------------
 
 IdiotPlayer::IdiotPlayer() {
@@ -226,6 +221,9 @@ int IdiotPlayer::Think() {
 }
 
 void IdiotPlayer::Info(int guess, int a, int b) {
+}
+
+void IdiotPlayer::Reset() {
 }
 
 }  // namespace master_mind
