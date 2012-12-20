@@ -32,7 +32,7 @@ void Game::Run() {
     moves_++;
     Compare(secret_, guess, &a, &b);
     Msg("%04d: %dA%dB\n", guess, a, b);
-    player_->Info(a, b);
+    player_->Info(guess, a, b);
     if (guess == secret_) {
       won_ = true;
       Msg("Won! Moves: %d.\n", moves_);

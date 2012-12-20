@@ -55,7 +55,7 @@ HumanPlayer::~HumanPlayer() {
 
 int HumanPlayer::Think() {
   char line[1 << 10];
-  guess_ = 0;
+  int guess = 0;
   while (true) {
     printf(">> ");
     if (!fgets(line, sizeof line, stdin))
@@ -67,15 +67,15 @@ int HumanPlayer::Think() {
         printf("%04d    ", pset[i]);
       puts("");
     } else {
-      sscanf(line, "%d", &guess_);
+      sscanf(line, "%d", &guess);
       break;
     }
   }
-  return guess_;
+  return guess;
 }
 
-void HumanPlayer::Info(int a, int b) {
-  analyst_->Update(guess_, a, b);
+void HumanPlayer::Info(int guess, int a, int b) {
+  analyst_->Update(guess, a, b);
 }
 
 // ----------------- SmartPlayer ------------------
@@ -190,7 +190,7 @@ int SmartPlayer::Think() {
   return node_->guess;
 }
 
-void SmartPlayer::Info(int a, int b) {
+void SmartPlayer::Info(int guess, int a, int b) {
   int k = a * 5 + b;
   node_ = node_->child[k];
 }
@@ -206,11 +206,11 @@ GreedyPlayer::~GreedyPlayer() {
 
 int GreedyPlayer::Think() {
   const vector<int>& pset = analyst_->PSet();
-  return guess_ = pset[rand() % pset.size()];
+  return pset[rand() % pset.size()];
 }
 
-void GreedyPlayer::Info(int a, int b) {
-  analyst_->Update(guess_, a, b);
+void GreedyPlayer::Info(int guess, int a, int b) {
+  analyst_->Update(guess, a, b);
 }
 
 // ----------------- IdiotPlayer ------------------
@@ -225,7 +225,7 @@ int IdiotPlayer::Think() {
   return Game::RandomState();
 }
 
-void IdiotPlayer::Info(int a, int b) {
+void IdiotPlayer::Info(int guess, int a, int b) {
 }
 
 }  // namespace master_mind

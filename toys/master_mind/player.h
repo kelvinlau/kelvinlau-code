@@ -9,7 +9,7 @@ class Player {
   virtual ~Player();
 
   virtual int Think() = 0;
-  virtual void Info(int a, int b) = 0;  // TODO: add guess.
+  virtual void Info(int guess, int a, int b) = 0;
 };
 
 class GameAnalyst;
@@ -20,10 +20,9 @@ class HumanPlayer : public Player {
   virtual ~HumanPlayer();
 
   virtual int Think();
-  virtual void Info(int a, int b);
+  virtual void Info(int guess, int a, int b);
 
  private:
-  int guess_;
   GameAnalyst* analyst_;
 };
 
@@ -33,10 +32,9 @@ class GreedyPlayer : public Player {
   virtual ~GreedyPlayer();
 
   virtual int Think();
-  virtual void Info(int a, int b);
+  virtual void Info(int guess, int a, int b);
 
  private:
-  int guess_;
   GameAnalyst* analyst_;
 };
 
@@ -46,7 +44,7 @@ class SmartPlayer : public Player {
   virtual ~SmartPlayer();
 
   virtual int Think();
-  virtual void Info(int a, int b);
+  virtual void Info(int guess, int a, int b);
 
  private:
   struct DecisionTree {
@@ -73,7 +71,7 @@ class IdiotPlayer : public Player {
   virtual ~IdiotPlayer();
 
   virtual int Think();
-  virtual void Info(int a, int b);
+  virtual void Info(int guess, int a, int b);
 
  private:
 };
