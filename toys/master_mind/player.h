@@ -66,6 +66,8 @@ class SmartPlayer : public Player {
   SmartPlayer();
   virtual ~SmartPlayer();
 
+  void Init();
+
   virtual void Prepare();
   virtual int Think();
   virtual void Info(int guess, int a, int b);
@@ -82,11 +84,20 @@ class SmartPlayer : public Player {
   void Free();
   void FreeTree(DecisionTree*);
 
-  double DecisionEntropy(const GameAnalyst& analyst, int g);
-  double Entropy(int a[], int n);
+  double DecisionScore(const GameAnalyst& analyst, int g);
+  virtual double Score(int a[], int n);
 
   DecisionTree* root_;
   DecisionTree* node_;
+};
+
+class SquarePlayer : public SmartPlayer {
+ public:
+  SquarePlayer();
+  virtual ~SquarePlayer();
+
+ private:
+  double Score(int a[], int n);
 };
 
 class IdiotPlayer : public Player {

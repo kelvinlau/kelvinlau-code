@@ -23,8 +23,16 @@ int match(const char* str, const char* pat_) {
 }
 
 Player* GetPlayerByName(const char* name) {
-  if (match(name, "smart|s"))
-    return new SmartPlayer;
+  if (match(name, "smart|s")) {
+    SmartPlayer* player = new SmartPlayer;
+    player->Init();
+    return player;
+  }
+  if (match(name, "square|sq")) {
+    SquarePlayer* player = new SquarePlayer;
+    player->Init();
+    return player;
+  }
   if (match(name, "human|h"))
     return new HumanPlayer;
   if (match(name, "idiot|i"))
@@ -79,6 +87,7 @@ int Main(int argc, char** argv) {
            "\n"
            "<player>:\n"
            "  smart|s: Smart player (default);\n"
+           "  square|sq: Smart player using square scoring function;\n"
            "  human|h: Human player;\n"
            "  idiot|i: Idiot player;\n"
            "  greedy|g: Greedy player;\n"

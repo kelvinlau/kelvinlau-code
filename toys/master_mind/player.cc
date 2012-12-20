@@ -89,13 +89,16 @@ void HumanPlayer::Leave() {
 // ----------------- SmartPlayer ------------------
 
 SmartPlayer::SmartPlayer() {
-  GameAnalyst analyst;
-  root_ = BuildTree(analyst, 1);
-  node_ = root_;
+  root_ = NULL;
 }
 
 SmartPlayer::~SmartPlayer() {
   FreeTree(root_);
+}
+
+void SmartPlayer::Init() {
+  GameAnalyst analyst;
+  root_ = BuildTree(analyst, 1);
 }
 
 // Build a decision tree.
@@ -109,12 +112,12 @@ SmartPlayer::DecisionTree* SmartPlayer::BuildTree(const GameAnalyst& analyst,
   if (depth == 1) {
     node->guess = 1234;  // Fixed number at first guess.
   } else {
-    double emax = -1e100;
+    double smax = -1e100;
     for (int i = 0; i < pset.size(); ++i) {
       int g = pset[i];
-      double e = DecisionEntropy(analyst, g);
-      if (emax < e) {
-        emax = e;
+      double s = DecisionScore(analyst, g);
+      if (smax < s) {
+        smax = s;
         node->guess = g;
       }
     }
@@ -147,7 +150,7 @@ void SmartPlayer::FreeTree(DecisionTree* node) {
   delete node;
 }
 
-double SmartPlayer::DecisionEntropy(const GameAnalyst& analyst, int g) {
+double SmartPlayer::DecisionScore(const GameAnalyst& analyst, int g) {
   const vector<int>& pset = analyst.PSet();
   int a, b, k, p[25];
   memset(p, 0, sizeof p);
@@ -157,22 +160,20 @@ double SmartPlayer::DecisionEntropy(const GameAnalyst& analyst, int g) {
     k = a * 5 + b;
     p[k]++;
   }
-  return Entropy(p, 25);
+  return Score(p, 25);
 }
 
-double SmartPlayer::Entropy(int a[], int n) {
-  int s = 0;
+double SmartPlayer::Score(int a[], int n) {
+  int sum = 0;
   for (int i = 0; i < n; ++i)
-    s += a[i];
-  double e = 0.0;
+    sum += a[i];
+  double s = 0.0;
   for (int i = 0; i < n; ++i) {
     if (a[i] == 0) continue;
-    double p = 1.0 * a[i] / s;
-    e -= p * log(p);
-//    e -= p * p;
-//    e = std::min(e, -p);
+    double p = 1.0 * a[i] / sum;
+    s -= p * log(p);
   }
-  return e;
+  return s;
 }
 
 void SmartPlayer::Prepare() {
@@ -189,6 +190,28 @@ void SmartPlayer::Info(int guess, int a, int b) {
 }
 
 void SmartPlayer::Leave() {
+}
+
+// ----------------- SquarePlayer ------------------
+
+SquarePlayer::SquarePlayer() {
+  puts("SquarePlayer ctor");
+}
+
+SquarePlayer::~SquarePlayer() {
+}
+
+double SquarePlayer::Score(int a[], int n) {
+  int sum = 0;
+  for (int i = 0; i < n; ++i)
+    sum += a[i];
+  double s = 0.0;
+  for (int i = 0; i < n; ++i) {
+    if (a[i] == 0) continue;
+    double p = 1.0 * a[i] / sum;
+    s -= p * p;
+  }
+  return s;
 }
 
 // ----------------- GreedyPlayer ------------------
