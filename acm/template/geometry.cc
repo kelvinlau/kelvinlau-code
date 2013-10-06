@@ -12,6 +12,11 @@ inline int sign(double x) {
   return x < -eps ? -1 : x > eps;
 }
 
+inline int sign(double x, double y) {
+  x -= y;
+  return x < -eps ? -1 : x > eps;
+}
+
 inline double sqr(double x) {
   return x * x;
 }
@@ -21,6 +26,10 @@ inline double sqr(double x) {
 struct point {
   double x, y;
   point(double x = 0, double y = 0) : x(x), y(y) {}
+
+  void read() {
+    scanf("%lf %lf", &x, &y);
+  }
 
   bool operator<(const point &p) const {
     return sign(x - p.x) * 2 + sign(y - p.y) < 0;
@@ -271,7 +280,7 @@ double dist_line_point(line l, point a) {
 
 double dist_lineseg_point(line l, point a) {
   if (on_lineseg(l, a)) return 0;
-  if (on_line(l, a) || !sharp(l.p, a, l.q))
+  if (sign(dot(l.p, l.q, a)) <= 0 || sign(dot(l.q, l.p, a)) <= 0)
     return min(dist(l.p, a), dist(l.q, a));
   return dist_line_point(l, a);
 }
@@ -581,8 +590,30 @@ struct circle {
   circle(double x, double y, double r = 1) : o(x, y), r(r) {}
 };
 
-int intersected_circle_line(circle c, line l) {
-  return sign(dist_line_point(l, c.o) - c.r) < 0;
+/* 0: on circle; -1: inside circle; 1: outside circle */
+int relation_circle_point(circle c, point a) {
+  return sign(c.r - dist(a, c.o));
+}
+
+/* 0: tangent; -1: intersected; 1: outside circle */
+int relation_circle_line(circle c, line l) {
+  return sign(dist_line_point(l, c.o) - c.r);
+}
+
+/* 0: just touch; -1: inside circle; 1: outside circle */
+int relation_circle_lineseg(circle d, line l) {
+  return sign(dist_lineseg_point(l, d.o), d.r);
+}
+
+bool has_common_point_circle_triangle(circle d, point a, point b, point c) {
+  if (relation_circle_point(d, a) <= 0) return true;
+  if (relation_circle_point(d, b) <= 0) return true;
+  if (relation_circle_point(d, c) <= 0) return true;
+  if (relation_circle_lineseg(d, line(a, b)) <= 0) return true;
+  if (relation_circle_lineseg(d, line(b, c)) <= 0) return true;
+  if (relation_circle_lineseg(d, line(a, c)) <= 0) return true;
+  point p[] = {a, b, c};
+  return inside_polygon(p, 3, d.o);
 }
 
 int ip_circle_line(circle c, line l, point &p1, point &p2) {
@@ -662,11 +693,6 @@ void circle_tangents(circle c, point p, point &a, point &b) {
   b.y = c.o.y + (p.y - c.o.y) * para - (p.x - c.o.x) * perp;
 }
 
-/* 0: oncircle; 1: inside circle; -1: outside circle*/
-int on_circle(circle c, point a) {
-  return sign(c.r - dist(a, c.o));
-}
-
 /* minimum circle that covers 2 points */
 circle cc2(point a, point b) {
   return circle(mp(a, b), dist(a, b) / 2);
@@ -676,9 +702,9 @@ circle cc2(point a, point b) {
 circle cc3(point p, point q, point r) {
   circle c;
 
-  if (on_circle(c = cc2(p, q), r) >= 0) return c;
-  if (on_circle(c = cc2(p, r), q) >= 0) return c;
-  if (on_circle(c = cc2(q, r), p) >= 0) return c;
+  if (relation_circle_point(c = cc2(p, q), r) <= 0) return c;
+  if (relation_circle_point(c = cc2(p, r), q) <= 0) return c;
+  if (relation_circle_point(c = cc2(q, r), p) <= 0) return c;
 
   c.o = ccc(p, q, r);
   c.r = dist(c.o, p);
@@ -698,12 +724,12 @@ circle min_circle_cover(point p[], int n) {
     point *b = p;
     for (int i = 1; i < n; i++)
       if (dist(p[i], c.o) > dist(*b, c.o)) b = &p[i];
-    if (on_circle(c, *b) >= 0) return c;
+    if (relation_circle_point(c, *b) <= 0) return c;
 
     ps[3] = b;
     for (int i = 0; i < 3; i++) {
       swap(ps[i], ps[3]);
-      if (on_circle(c = cc3(*ps[0], *ps[1], *ps[2]), *ps[3]) >= 0) break;
+      if (relation_circle_point(c = cc3(*ps[0], *ps[1], *ps[2]), *ps[3]) <= 0) break;
     }
   }
 }
