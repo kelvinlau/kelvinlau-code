@@ -13,8 +13,8 @@ struct node {
 inline node *up(node *x) {
   node *l = x->l;
   node *r = x->r;
-  x->g = max((l ? max(l->w, l->g) + l->f : 0),
-             (r ? max(r->w, r->g) + r->f : 0));
+  x->g = max((l ? l->g + l->f : 0), (r ? r->g + r->f : 0));
+  x->g = max(x->g, x->w);
   return x;
 }
 
@@ -38,7 +38,8 @@ inline node *down(node *x) {
 inline void lr(node *x) {
   node *y = x->r;
   node *b = y->l;
-  if (x->r = b)
+  x->r = b;
+  if (b)
     b->p = x;
   y->p = x->p;
   if (x->p) {
@@ -51,13 +52,13 @@ inline void lr(node *x) {
   x->p = y;
   swap(x->q, y->q);
   up(x);
-  up(y);
 }
 
 inline void rr(node *x) {
   node *y = x->l;
   node *b = y->r;
-  if (x->l = b)
+  x->l = b;
+  if (b)
     b->p = x;
   y->p = x->p;
   if (x->p) {
@@ -70,20 +71,22 @@ inline void rr(node *x) {
   x->p = y;
   swap(x->q, y->q);
   up(x);
-  up(y);
+}
+
+void push(node *x) {
+  if (x->p) push(x->p);
+  down(x);
 }
 
 void splay(node *x) {
-  node *p;
-  while (p = x->p) {
-    down(p);
-    down(x);
-    if (p->l == x)
-      rr(p);
+  push(x);
+  while (x->p) {
+    if (x->p->l == x)
+      rr(x->p);
     else
-      lr(p);
+      lr(x->p);
   }
-  down(x);
+  up(x);
 }
 
 void access(node *x) {
@@ -160,5 +163,5 @@ void add(node *x, node *y, int d) {
 int query(node *x, node *y) {
   rotate(x);
   access(y);
-  return y->f + max(y->w, y->g);
+  return y->g;
 }
