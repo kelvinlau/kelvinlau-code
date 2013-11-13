@@ -10,12 +10,11 @@ struct node {
   int z, f, g, w;
 } nodes[N];
 
-inline node *up(node *x) {
+inline void up(node *x) {
   node *l = x->l;
   node *r = x->r;
   x->g = max((l ? l->g + l->f : 0), (r ? r->g + r->f : 0));
   x->g = max(x->g, x->w);
-  return x;
 }
 
 inline node *down(node *x) {
@@ -35,6 +34,11 @@ inline node *down(node *x) {
   return x;
 }
 
+void push(node *x) {
+  if (x->p) push(x->p);
+  down(x);
+}
+
 inline void lr(node *x) {
   node *y = x->r;
   node *b = y->l;
@@ -50,7 +54,8 @@ inline void lr(node *x) {
   }
   y->l = x;
   x->p = y;
-  swap(x->q, y->q);
+  y->q = x->q;
+  x->q = NULL;
   up(x);
 }
 
@@ -69,22 +74,31 @@ inline void rr(node *x) {
   }
   y->r = x;
   x->p = y;
-  swap(x->q, y->q);
+  y->q = x->q;
+  x->q = NULL;
   up(x);
 }
 
-void push(node *x) {
-  if (x->p) push(x->p);
-  down(x);
+inline void rot(node *x) {
+  if (x->p->l == x)
+    rr(x->p);
+  else
+    lr(x->p);
 }
 
 void splay(node *x) {
   push(x);
   while (x->p) {
-    if (x->p->l == x)
-      rr(x->p);
-    else
-      lr(x->p);
+    node *p = x->p;
+    if (!p->p) {
+      rot(x);
+    } else if ((p->l == x) ^ (p->p->l == p)) {
+      rot(x);
+      rot(x);
+    } else {
+      rot(p);
+      rot(x);
+    }
   }
   up(x);
 }
