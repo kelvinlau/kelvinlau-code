@@ -80,10 +80,6 @@ ll gcd(ll x, ll y) {
   return !y ? x : gcd(y, x % y);
 }
 
-ll f(ll x, ll m, ll c) {
-  return (modular_multiply(x, x, m) + c) % m;
-}
-
 ll pollard_rho(ll n) {
   if (!(n & 1))
     return 2;
@@ -93,9 +89,12 @@ ll pollard_rho(ll n) {
     ll y = x;
     ll c = rand() % n;
     ll d = 1;
+    auto f = [=](ll x) {
+      return (modular_multiply(x, x, n) + c) % n;
+    };
     while (1) {
-      x = f(x, n, c);
-      y = f(f(y, n, c), n, c);
+      x = f(x);
+      y = f(f(y));
       d = gcd(y > x ? y - x : x - y, n);
       if (d == n) break;
       if (d > 1) return d;

@@ -30,19 +30,21 @@ void factorize1(int n, int p[], int k[], int &m) {
 
 /* assumes that n < M * M */
 void factorize(int n, int p[], int k[], int &m) {
+  auto drain = [&](int x) {
+    p[m] = x, k[m] = 0;
+    while (n % x == 0)
+      n /= x, k[m]++;
+    m++;
+  };
+
   m = 0;
   for (int i = 0; n >= M && prime[i] * prime[i] <= n; i++)
     if (n % prime[i] == 0) {
-      p[m] = prime[i], k[m] = 0;
-      while (n % p[m] == 0)
-        n /= p[m], k[m]++;
-      m++;
+      drain(prime[i]);
     }
   if (n < M)
-    for (; n > 1; m++) {
-      p[m] = fp[n], k[m] = 0;
-      while (n % p[m] == 0)
-        n /= p[m], k[m]++;
+    while (n > 1) {
+      drain(fp[n]);
     }
   if (n > 1)
     p[m] = n, k[m++] = 1;
