@@ -1,28 +1,15 @@
 syntax on
 filetype plugin indent on
-set nocp nu ru bg=dark ai si et bs=2 fo+=ro is nohls
+set nocp nu ru bg=dark ai si et bs=2 fo+=ro is hls
 set mouse=a aw ar wmnu nowrap nobackup noswf
 let &tenc=&enc
 set fencs=utf-8,gbk
 set ts=2 sw=2 sts=2
-au FileType c,cpp,java,javascript setl cin
-
-" comments
-map <F3> :s!^!# !<CR>
-map <F4> :s!^# !!<CR>
-au FileType c,cpp,java,javascript map <buffer> <F3> :s!^!//!<CR>
-au FileType c,cpp,java,javascript map <buffer> <F4> :s!^//!!<CR>
-au FileType vim map <buffer> <F3> :s!^!" !<CR>
-au FileType vim map <buffer> <F4> :s!^" !!<CR>
+set tw=80 cc=+1
 
 " clipboard
-" map <F2> ggVG"+y
-" vmap<F2> "+y
-" map <F2> ggVG:!xclip -sel clip<CR>u
-" vmap<F2> :!xclip -sel clip<CR>u
-" map <F2> ggVG:!pbcopy<CR>u
-" vmap<F2> :!pbcopy<CR>u
 set pastetoggle=<F9>
+set clipboard=unnamedplus
 
 " buffers
 map <C-h> :bp<CR>
