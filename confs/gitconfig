@@ -1,0 +1,30 @@
+[alias]
+  br  = branch
+  st  = status
+  ci  = commit
+  co  = checkout
+  cp  = cherry-pick
+  d   = diff -b
+  ds  = diff -b --stat
+  dc  = diff -b --cached
+  dcs = diff -b --cached --stat
+  l   = log --oneline
+  fixup = commit -a --amend --no-edit
+  ll = log --stat
+  lg = log
+  lp = log -p
+  dtc = diff-tree --no-commit-id --name-status -r
+[core]
+  pager = less -+$LESS -RSXF
+[color]
+  ui = true
+[merge]
+  tool = vimdiff
+  conflictstyle = diff3
+[mergetool]
+  keepBackup = false
+[difftool]
+  prompt = false
+[user]
+	name = Kelvin Lau
+	email = kelvinlau@gmail.com
